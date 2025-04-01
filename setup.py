@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 """
 setup.py
-A module that installs the SKIDNAME skid as a module
+A module that installs the uocc skid as a module
 """
 
 from pathlib import Path
@@ -11,11 +11,11 @@ from setuptools import find_packages, setup
 
 #: Load version from source file
 version = {}
-version_file = Path(__file__).parent / "src" / "skidname" / "version.py"
+version_file = Path(__file__).parent / "src" / "uocc" / "version.py"
 exec(version_file.read_text(), version)
 
 setup(
-    name="skidname",
+    name="uocc-skid",
     version=version["__version__"],
     license="MIT",
     long_description=(Path(__file__).parent / "README.md").read_text(),
@@ -39,7 +39,7 @@ setup(
     },
     keywords=["gis"],
     install_requires=[
-        "ugrc-palletjack>=5.0,<5.2",
+        "ugrc-palletjack>=5.0,<5.3",
         "ugrc-supervisor>=3.1.3",
     ],
     extras_require={
@@ -47,7 +47,6 @@ setup(
             "pytest-cov>=6",
             "pytest-instafail==0.5.*",
             "pytest-mock==3.*",
-            "pytest-ruff==0.*",
             "pytest-watch==4.*",
             "pytest>=7,<9",
             "ruff==0.*",
@@ -59,7 +58,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "skidname = skidname.main:function",
+            "uocc-skid = uocc.main:function",
         ]
     },
 )
