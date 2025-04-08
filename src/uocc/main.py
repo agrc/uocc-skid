@@ -15,8 +15,10 @@ from types import SimpleNamespace
 
 import arcgis
 import functions_framework
+import google.auth
+import pandas as pd
 from cloudevents.http import CloudEvent
-from palletjack import extract, load, transform, utils
+from palletjack import extract, load, transform
 from supervisor.message_handlers import SendGridHandler
 from supervisor.models import MessageDetails, Supervisor
 
@@ -42,8 +44,9 @@ class Skid:
     def __del__(self):
         self.tempdir.cleanup()
 
+    @staticmethod
     def _get_secrets():
-        """A helper method for loading secrets from either a GCF mount point or the local src/skidname/secrets/secrets.json file
+        """A helper method for loading secrets from either a GCF mount point or the local src/skid/secrets/secrets.json file
 
         Raises:
             FileNotFoundError: If the secrets file can't be found.
@@ -56,7 +59,10 @@ class Skid:
 
         #: Try to get the secrets from the Cloud Function mount point
         if secret_folder.exists():
-            return json.loads(Path("/secrets/app/secrets.json").read_text(encoding="utf-8"))
+            secrets_dict = json.loads(Path("/secrets/app/secrets.json").read_text(encoding="utf-8"))
+            credentials, _ = google.auth.default()
+            secrets_dict["SERVICE_ACCOUNT_JSON"] = credentials
+            return secrets_dict
 
         #: Otherwise, try to load a local copy for local development
         secret_folder = Path(__file__).parent / "secrets"
@@ -136,6 +142,9 @@ class Skid:
         locations_df = self._extract_locations_from_sheet()
         contacts_df = self._extract_contacts_from_sheet()
 
+        locations_count = self._load_locations_to_agol(gis, locations_df)
+        contacts_count = self._load_contacts_to_agol(gis, contacts_df)
+
         end = datetime.now()
 
         summary_message = MessageDetails()
@@ -147,8 +156,8 @@ class Skid:
             f"Start time: {start.strftime('%H:%M:%S')}",
             f"End time: {end.strftime('%H:%M:%S')}",
             f"Duration: {str(end - start)}",
-            #: Add other rows here containing summary info captured/calculated during the working portion of the skid,
-            #: like the number of rows updated or the number of successful attachment overwrites.
+            f"Locations loaded: {locations_count}",
+            f"Contacts loaded: {contacts_count}",
         ]
 
         summary_message.message = "\n".join(summary_rows)
@@ -162,29 +171,74 @@ class Skid:
 
     def _extract_locations_from_sheet(self):
         gsheet_extractor = extract.GSheetLoader(self.secrets.SERVICE_ACCOUNT_JSON)
-        uocc_df = gsheet_extractor.load_specific_worksheet_into_dataframe(self.secrets.SHEET_ID, "UOCCs", by_title=True)
+        uocc_df = gsheet_extractor.load_specific_worksheet_into_dataframe(
+            self.secrets.UOCC_LOCATIONS_SHEET_ID, "UOCCs", by_title=True
+        )
 
-        renamed_df = transform.DataCleaning.rename_dataframe_columns_for_agol(uocc_df).rename(
-            columns={
-                "Longitude_": "Longitude",
-                "Accept Material\n Dropped \n Off by the Public": "Accept_Material_Dropped_Off_by_",
-                "Gallons_of_Used_Oil_Collected_for_Recycling_Last_Year": "Gallons_of_Used_Oil_Collected_f",
-            }
+        renamed_df = (
+            transform.DataCleaning.rename_dataframe_columns_for_agol(uocc_df)
+            .rename(
+                columns={
+                    "Longitude_": "Longitude",
+                    "Accept_Material__Dropped___Off_by_the_Public": "Accept_Material_Dropped_Off_by_",
+                    "Gallons_of_Used_Oil_Collected_for_Recycling_Last_Year": "Gallons_of_Used_Oil_Collected_f",
+                }
+            )
+            .drop(
+                columns=[
+                    "Local_Health_Department",
+                    "UOCC_Email_Address",
+                    "Corporate_Email_Address",
+                    "Corporate_Contact_Name",
+                    "UOCC_Contact_Name",
+                ]
+            )
         )
         renamed_df["ID_"] = renamed_df["ID_"].astype(str)
 
         return renamed_df
 
+    def _load_locations_to_agol(self, gis, locations_df):
+        self.skid_logger.info("Creating, projecting, and cleaning spatial location data...")
+        #: Drop empty lat/long
+        locations_df = locations_df[locations_df["Latitude"].astype(bool) & locations_df["Longitude"].astype(bool)]
+        spatial_df = pd.DataFrame.spatial.from_xy(locations_df, "Longitude", "Latitude")
+        spatial_df.spatial.project(3857)
+        spatial_df.spatial.set_geometry("SHAPE")
+        spatial_df.spatial.sr = {"wkid": 3857}
+        spatial_df = transform.DataCleaning.switch_to_float(
+            spatial_df,
+            [
+                "Latitude",
+                "Longitude",
+                "Gallons_of_Used_Oil_Collected_f",
+            ],
+        )
+        spatial_df = transform.DataCleaning.switch_to_nullable_int(spatial_df, ["Zip_Code"])
+
+        self.skid_logger.info("Truncating and loading location data...")
+        updater = load.ServiceUpdater(gis, self.secrets.UOCC_LOCATIONS_ITEMID, working_dir=self.tempdir_path)
+        load_count = updater.truncate_and_load(spatial_df)
+        return load_count
+
     def _extract_contacts_from_sheet(self):
         gsheet_extractor = extract.GSheetLoader(self.secrets.SERVICE_ACCOUNT_JSON)
         contacts_df = gsheet_extractor.load_specific_worksheet_into_dataframe(
-            self.secrets.SHEET_ID, "UOCC Contacts", by_title=True
+            self.secrets.UOCC_CONTACTS_SHEET_ID, "UOCC Contacts", by_title=True
         )
 
         renamed_df = transform.DataCleaning.rename_dataframe_columns_for_agol(contacts_df)
         renamed_df["ID_"] = renamed_df["ID_"].astype(str)
 
         return renamed_df
+
+    def _load_contacts_to_agol(self, gis, contacts_df):
+        self.skid_logger.info("Truncating and loading contact data...")
+        updater = load.ServiceUpdater(
+            gis, self.secrets.UOCC_CONTACTS_ITEMID, service_type="table", working_dir=self.tempdir_path
+        )
+        load_count = updater.truncate_and_load(contacts_df)
+        return load_count
 
 
 @functions_framework.cloud_event
@@ -210,9 +264,11 @@ def subscribe(cloud_event: CloudEvent) -> None:
         pass
 
     #: Call process() and any other functions you want to be run as part of the skid here.
-    process()
+    uocc_skid = Skid()
+    uocc_skid.process()
 
 
 #: Putting this here means you can call the file via `python main.py` and it will run. Useful for pre-GCF testing.
 if __name__ == "__main__":
-    process()
+    uocc_skid = Skid()
+    uocc_skid.process()
