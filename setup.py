@@ -41,6 +41,7 @@ setup(
     install_requires=[
         "ugrc-palletjack>=5.0,<5.3",
         "ugrc-supervisor>=3.1.3",
+        "functions-framework==3.8.*",
     ],
     extras_require={
         "tests": [
@@ -50,7 +51,6 @@ setup(
             "pytest-watch==4.*",
             "pytest>=7,<9",
             "ruff==0.*",
-            "functions-framework==3.8.*",
         ]
     },
     setup_requires=[
