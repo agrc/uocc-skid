@@ -1,5 +1,6 @@
 secrets.json
 sheets-sa.json
+notebooks/
 
 *.py[cod]
 

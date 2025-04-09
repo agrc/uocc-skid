@@ -140,6 +140,7 @@ class Skid:
         gis = arcgis.gis.GIS(config.AGOL_ORG, self.secrets.AGOL_USER, self.secrets.AGOL_PASSWORD)
 
         locations_df = self._extract_locations_from_sheet()
+        locations_df = self._add_lhd_by_county(locations_df)
         contacts_df = self._extract_contacts_from_sheet()
 
         locations_count = self._load_locations_to_agol(gis, locations_df)
@@ -197,6 +198,43 @@ class Skid:
         renamed_df["ID_"] = renamed_df["ID_"].astype(str)
 
         return renamed_df
+
+    def _add_lhd_by_county(self, locations_df):
+        counties_to_lhd = {
+            "Box Elder": "BRHD",
+            "Cache": "BRHD",
+            "Rich": "BRHD",
+            "Weber": "WMHD",
+            "Morgan": "WMHD",
+            "Davis": "DCHD",
+            "Salt Lake": "SLCoHD",
+            "Utah": "UCHD",
+            "Wasatch": "WCHD",
+            "Summit": "SCHD",
+            "Juab": "CUHD",
+            "Millard": "CUHD",
+            "Piute": "CUHD",
+            "Sanpete": "CUHD",
+            "Sevier": "CUHD",
+            "Wayne": "CUHD",
+            "Tooele": "TCHD",
+            "Beaver": "SWUHD",
+            "Iron": "SWUHD",
+            "Kane": "SWUHD",
+            "Washington": "SWUHD",
+            "Garfield": "SWUHD",
+            "San Juan": "SJHD",
+            "Grand": "SEUHD",
+            "Emery": "SEUHD",
+            "Carbon": "SEUHD",
+            "Duchesne": "TCHD",
+            "Daggett": "TCHD",
+            "Uintah": "TCHD",
+        }
+
+        locations_df["lhd"] = locations_df["County"].apply(lambda x: str(x).strip()).replace(counties_to_lhd)
+
+        return locations_df
 
     def _load_locations_to_agol(self, gis, locations_df):
         self.skid_logger.info("Creating, projecting, and cleaning spatial location data...")
