@@ -7,6 +7,7 @@ Run the SKIDNAME script as a cloud function.
 import base64
 import json
 import logging
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -146,6 +147,8 @@ class Skid:
         locations_count = self._load_locations_to_agol(gis, locations_df)
         contacts_count = self._load_contacts_to_agol(gis, contacts_df)
 
+        self._extract_responses_from_agol()
+
         end = datetime.now()
 
         summary_message = MessageDetails()
@@ -277,6 +280,39 @@ class Skid:
         )
         load_count = updater.truncate_and_load(contacts_df)
         return load_count
+
+    def _extract_responses_from_agol(self, gis):
+        feature_layer = gis.content.get(self.secrets.RESULTS_ITEMID).layers[0]
+        responses = feature_layer.query(return_geometry=False, as_df=True)
+
+        alias_mapper = {field["name"]: field["alias"] for field in feature_layer.properties.fields}
+        new_column_names = self._map_aliases_to_columns(alias_mapper)
+        responses.rename(columns=new_column_names, inplace=True)
+        responses.drop(columns=["ObjectID"], inplace=True)
+
+        return responses
+
+    @staticmethod
+    def _map_aliases_to_columns(alias_mapper_dict):
+        number_regex = re.compile(r"\d{1,2}\. ")
+        sub_number_regex = re.compile(r"\d{1,2}[a-z]{1}\. ")
+
+        current = ""
+        end_field = "certify"
+        for field, alias in alias_mapper_dict.items():
+            if field == end_field:
+                break
+            if number_regex.search(alias):
+                current = number_regex.search(alias).group(0)
+                continue
+            if sub_number_regex.search(alias):
+                continue
+            if current:
+                new_alias = current + alias
+                alias_mapper_dict[field] = new_alias
+                continue
+
+        return alias_mapper_dict
 
 
 @functions_framework.cloud_event
