@@ -178,29 +178,17 @@ class Skid:
         uocc_df = gsheet_extractor.load_specific_worksheet_into_dataframe(
             self.secrets.UOCC_LOCATIONS_SHEET_ID, "UOCCs", by_title=True
         )
+        uocc_df["ID#"] = uocc_df["ID#"].astype(str)
 
-        renamed_df = (
-            transform.DataCleaning.rename_dataframe_columns_for_agol(uocc_df)
-            .rename(
-                columns={
-                    "Longitude_": "Longitude",
-                    "Accept_Material__Dropped___Off_by_the_Public": "Accept_Material_Dropped_Off_by_",
-                    "Gallons_of_Used_Oil_Collected_for_Recycling_Last_Year": "Gallons_of_Used_Oil_Collected_f",
-                }
-            )
-            .drop(
-                columns=[
-                    "Local_Health_Department",
-                    "UOCC_Email_Address",
-                    "Corporate_Email_Address",
-                    "Corporate_Contact_Name",
-                    "UOCC_Contact_Name",
-                ]
-            )
+        return uocc_df.drop(
+            columns=[
+                "Local Health Department",
+                "UOCC Email Address",
+                "Corporate Email Address",
+                "Corporate Contact Name",
+                "UOCC Contact Name",
+            ]
         )
-        renamed_df["ID_"] = renamed_df["ID_"].astype(str)
-
-        return renamed_df
 
     def _add_lhd_by_county(self, locations_df):
         counties_to_lhd = {
@@ -239,47 +227,15 @@ class Skid:
 
         return locations_df
 
-    def _load_locations_to_agol(self, gis, locations_df):
-        self.skid_logger.info("Creating, projecting, and cleaning spatial location data...")
-        #: Drop empty lat/long
-        locations_df = locations_df[locations_df["Latitude"].astype(bool) & locations_df["Longitude"].astype(bool)]
-        spatial_df = pd.DataFrame.spatial.from_xy(locations_df, "Longitude", "Latitude")
-        spatial_df.spatial.project(3857)
-        spatial_df.spatial.set_geometry("SHAPE")
-        spatial_df.spatial.sr = {"wkid": 3857}
-        spatial_df = transform.DataCleaning.switch_to_float(
-            spatial_df,
-            [
-                "Latitude",
-                "Longitude",
-                "Gallons_of_Used_Oil_Collected_f",
-            ],
-        )
-        spatial_df = transform.DataCleaning.switch_to_nullable_int(spatial_df, ["Zip_Code"])
-
-        self.skid_logger.info("Truncating and loading location data...")
-        updater = load.ServiceUpdater(gis, self.secrets.UOCC_LOCATIONS_ITEMID, working_dir=self.tempdir_path)
-        load_count = updater.truncate_and_load(spatial_df)
-        return load_count
-
     def _extract_contacts_from_sheet(self):
         gsheet_extractor = extract.GSheetLoader(self.secrets.SERVICE_ACCOUNT_JSON)
         contacts_df = gsheet_extractor.load_specific_worksheet_into_dataframe(
             self.secrets.UOCC_CONTACTS_SHEET_ID, "UOCC Contacts", by_title=True
         )
 
-        renamed_df = transform.DataCleaning.rename_dataframe_columns_for_agol(contacts_df)
-        renamed_df["ID_"] = renamed_df["ID_"].astype(str)
+        contacts_df["ID#"] = contacts_df["ID#"].astype(str)
 
-        return renamed_df
-
-    def _load_contacts_to_agol(self, gis, contacts_df):
-        self.skid_logger.info("Truncating and loading contact data...")
-        updater = load.ServiceUpdater(
-            gis, self.secrets.UOCC_CONTACTS_ITEMID, service_type="table", working_dir=self.tempdir_path
-        )
-        load_count = updater.truncate_and_load(contacts_df)
-        return load_count
+        return contacts_df
 
     def _extract_responses_from_agol(self, gis):
         feature_layer = gis.content.get(self.secrets.RESULTS_ITEMID).layers[0]
