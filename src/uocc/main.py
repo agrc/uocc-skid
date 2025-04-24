@@ -7,8 +7,11 @@ Run the SKIDNAME script as a cloud function.
 import base64
 import json
 import logging
+import os
 import re
+import shutil
 import sys
+import zipfile
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -142,12 +145,18 @@ class Skid:
 
         locations_df = self._extract_locations_from_sheet()
         locations_df = self._add_lhd_by_county(locations_df)
+        locations_df = self._clean_field_names(locations_df)
+        locations_df = self._fix_apostrophes_bug(locations_df)
+        locations_without_ids = locations_df[locations_df["ID"].isna()]
+
         contacts_df = self._extract_contacts_from_sheet()
+        contacts_df = self._clean_field_names(contacts_df)
+        contacts_df = self._fix_apostrophes_bug(contacts_df)
+        contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
 
-        locations_count = self._load_locations_to_agol(gis, locations_df)
-        contacts_count = self._load_contacts_to_agol(gis, contacts_df)
+        update_success = self._update_items_in_survey_media_folder(gis, locations_df, contacts_df)
 
-        self._extract_responses_from_agol()
+        # self._extract_responses_from_agol()
 
         end = datetime.now()
 
@@ -160,9 +169,15 @@ class Skid:
             f"Start time: {start.strftime('%H:%M:%S')}",
             f"End time: {end.strftime('%H:%M:%S')}",
             f"Duration: {str(end - start)}",
-            f"Locations loaded: {locations_count}",
-            f"Contacts loaded: {contacts_count}",
+            f"Locations loaded: {len(locations_df)}",
+            f"Locations without IDs: {len(locations_without_ids)}",
+            f"Contacts loaded: {len(contacts_df)}",
+            f"Contacts without IDs: {len(contacts_without_ids)}",
         ]
+        if update_success:
+            summary_rows.append("Survey media folder updated successfully")
+        else:
+            summary_rows.append("Survey media folder update failed")
 
         summary_message.message = "\n".join(summary_rows)
         summary_message.attachments = self.tempdir_path / self.log_name
@@ -180,15 +195,18 @@ class Skid:
         )
         uocc_df["ID#"] = uocc_df["ID#"].astype(str)
 
-        return uocc_df.drop(
+        uocc_df.drop(
             columns=[
                 "Local Health Department",
                 "UOCC Email Address",
                 "Corporate Email Address",
                 "Corporate Contact Name",
                 "UOCC Contact Name",
-            ]
+            ],
+            inplace=True,
         )
+
+        return uocc_df[uocc_df["Status"].str.lower() == "open"].copy()
 
     def _add_lhd_by_county(self, locations_df):
         counties_to_lhd = {
@@ -227,6 +245,19 @@ class Skid:
 
         return locations_df
 
+    def _clean_field_names(self, df):
+        #: Can't have newlines, spaces, or hashes in the column names for the S123 app to work
+        df.columns = [col.replace("\n", "").replace(" ", "").replace("#", "") for col in df.columns]
+
+        return df
+
+    def _fix_apostrophes_bug(self, df):
+        #: re https://support.esri.com/en-us/bug/an-error-occurs-when-trying-to-edit-an-arcgis-survey123-bug-000146547
+        #: but the HTML entity code isn't working either, so just remove the apostrophes
+
+        df["FacilityName"] = df["FacilityName"].str.replace("'", "")
+        return df
+
     def _extract_contacts_from_sheet(self):
         gsheet_extractor = extract.GSheetLoader(self.secrets.SERVICE_ACCOUNT_JSON)
         contacts_df = gsheet_extractor.load_specific_worksheet_into_dataframe(
@@ -236,6 +267,33 @@ class Skid:
         contacts_df["ID#"] = contacts_df["ID#"].astype(str)
 
         return contacts_df
+
+    def _update_items_in_survey_media_folder(self, gis, locations_df, contacts_df):
+        #: Get the survey properties so we can use the title for the zipfile name
+        survey_manager = arcgis.apps.survey123.SurveyManager(gis)
+        survey_properties = survey_manager.get(self.secrets.SURVEY_ITEMID).properties
+
+        #: Download and extract the survey form
+        survey_item = gis.content.get(self.secrets.SURVEY_ITEMID)
+        downloaded_zip = survey_item.download(save_path=self.tempdir.name)
+
+        with zipfile.ZipFile(downloaded_zip) as zipped_file:
+            zipped_file.extractall(self.tempdir_path / "_survey")
+
+        #: Overwrite the locations and contacts with the new data
+        locations_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/locations_with_lhd.csv", index=False)
+        contacts_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/fake_uocc_contacts_with_id.csv", index=False)
+
+        #: Remove old zip file to avoid conflicts
+        os.remove(downloaded_zip)
+
+        #: Re-zip the survey form with the new data, update the AGOL item
+        new_zip_name = survey_properties["title"]
+        new_zip = shutil.make_archive(new_zip_name, "zip", self.tempdir_path / "_survey")
+
+        update_success = survey_item.update({}, new_zip)
+
+        return update_success
 
     def _extract_responses_from_agol(self, gis):
         feature_layer = gis.content.get(self.secrets.RESULTS_ITEMID).layers[0]
