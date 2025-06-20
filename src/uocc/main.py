@@ -154,9 +154,9 @@ class Skid:
         contacts_df = self._fix_apostrophes_bug(contacts_df)
         contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
 
-        update_success = self._update_items_in_survey_media_folder(gis, locations_df, contacts_df)
+        # update_success = self._update_items_in_survey_media_folder(gis, locations_df, contacts_df)
 
-        # self._extract_responses_from_agol()
+        responses = self._extract_responses_from_agol()
 
         end = datetime.now()
 
@@ -169,9 +169,9 @@ class Skid:
             f"Start time: {start.strftime('%H:%M:%S')}",
             f"End time: {end.strftime('%H:%M:%S')}",
             f"Duration: {str(end - start)}",
-            f"Locations loaded: {len(locations_df)}",
+            f"Locations extracted: {len(locations_df)}",
             f"Locations without IDs: {len(locations_without_ids)}",
-            f"Contacts loaded: {len(contacts_df)}",
+            f"Contacts extracted: {len(contacts_df)}",
             f"Contacts without IDs: {len(contacts_without_ids)}",
         ]
         if update_success:
@@ -226,7 +226,7 @@ class Skid:
             "Sanpete": "CUHD",
             "Sevier": "CUHD",
             "Wayne": "CUHD",
-            "Tooele": "TCHD",
+            "Tooele": "TCoHD",
             "Beaver": "SWUHD",
             "Iron": "SWUHD",
             "Kane": "SWUHD",
