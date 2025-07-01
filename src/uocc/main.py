@@ -141,7 +141,7 @@ class Skid:
         start = datetime.now()
 
         #: Get our GIS object via the ArcGIS API for Python
-        gis = arcgis.gis.GIS(config.AGOL_ORG, self.secrets.AGOL_USER, self.secrets.AGOL_PASSWORD)
+        self.gis = arcgis.gis.GIS(config.AGOL_ORG, self.secrets.AGOL_USER, self.secrets.AGOL_PASSWORD)
 
         locations_df = self._extract_locations_from_sheet()
         locations_df = self._add_lhd_by_county(locations_df)
@@ -154,7 +154,7 @@ class Skid:
         contacts_df = self._fix_apostrophes_bug(contacts_df)
         contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
 
-        # update_success = self._update_items_in_survey_media_folder(gis, locations_df, contacts_df)
+        # update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
 
         responses = self._extract_responses_from_agol()
 
@@ -268,13 +268,13 @@ class Skid:
 
         return contacts_df
 
-    def _update_items_in_survey_media_folder(self, gis, locations_df, contacts_df):
+    def _update_items_in_survey_media_folder(self, locations_df, contacts_df):
         #: Get the survey properties so we can use the title for the zipfile name
-        survey_manager = arcgis.apps.survey123.SurveyManager(gis)
+        survey_manager = arcgis.apps.survey123.SurveyManager(self.gis)
         survey_properties = survey_manager.get(self.secrets.SURVEY_ITEMID).properties
 
         #: Download and extract the survey form
-        survey_item = gis.content.get(self.secrets.SURVEY_ITEMID)
+        survey_item = self.gis.content.get(self.secrets.SURVEY_ITEMID)
         downloaded_zip = survey_item.download(save_path=self.tempdir.name)
 
         with zipfile.ZipFile(downloaded_zip) as zipped_file:
@@ -295,8 +295,8 @@ class Skid:
 
         return update_success
 
-    def _extract_responses_from_agol(self, gis):
-        feature_layer = gis.content.get(self.secrets.RESULTS_ITEMID).layers[0]
+    def _extract_responses_from_agol(self):
+        feature_layer = self.gis.content.get(self.secrets.RESULTS_ITEMID).layers[0]
         responses = feature_layer.query(return_geometry=False, as_df=True)
 
         alias_mapper = {field["name"]: field["alias"] for field in feature_layer.properties.fields}
@@ -312,7 +312,7 @@ class Skid:
         sub_number_regex = re.compile(r"\d{1,2}[a-z]{1}\. ")
 
         current = ""
-        end_field = "certify"
+        end_field = "assistance"
         for field, alias in alias_mapper_dict.items():
             if field == end_field:
                 break
