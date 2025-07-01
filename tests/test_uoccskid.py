@@ -133,7 +133,7 @@ class TestQuestionsRenaming:
             "foo": "1. First Question",
             "bar": "1a. First Question sub question",
             "baz": "2. Second Question",
-            "certify": "This is certified",
+            "assistance": "Requesting Assistance",
             "qux": "Shouldn't have number",
         }
 
@@ -141,7 +141,7 @@ class TestQuestionsRenaming:
             "foo": "1. First Question",
             "bar": "1a. First Question sub question",
             "baz": "2. Second Question",
-            "certify": "This is certified",
+            "assistance": "Requesting Assistance",
             "qux": "Shouldn't have number",
         }
 
@@ -179,7 +179,7 @@ class TestQuestionsRenaming:
             "bar_comments": "1. Comments",
             "baz": "2. Second Question",
             "baz_comments": "2. Comments",
-            "certify": "This is certified",
+            "assistance": "Requesting Assistance",
             "qux": "Shouldn't have number",
         }
 
@@ -191,7 +191,7 @@ class TestQuestionsRenaming:
             "bar_comments": "1. Comments",
             "baz": "2. Second Question",
             "baz_comments": "2. Comments",
-            "certify": "This is certified",
+            "assistance": "Requesting Assistance",
             "qux": "Shouldn't have number",
         }
 
