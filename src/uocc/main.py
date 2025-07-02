@@ -22,7 +22,7 @@ import functions_framework
 import google.auth
 import pandas as pd
 from cloudevents.http import CloudEvent
-from palletjack import extract, load, transform
+from palletjack import extract, load, transform, utils
 from supervisor.message_handlers import SendGridHandler
 from supervisor.models import MessageDetails, Supervisor
 
@@ -157,6 +157,12 @@ class Skid:
         # update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
 
         responses = self._extract_responses_from_agol()
+
+        self.lhd_sheet_ids = {
+            "BRHD": self.secrets.BRHD_SHEET_ID,
+        }
+
+        self._load_responses_to_sheet(responses, "BRHD")
 
         end = datetime.now()
 
@@ -296,15 +302,28 @@ class Skid:
         return update_success
 
     def _extract_responses_from_agol(self):
+        #: Download from AGOL
         feature_layer = self.gis.content.get(self.secrets.RESULTS_ITEMID).layers[0]
         responses = feature_layer.query(return_geometry=False, as_df=True)
 
+        #: Drop unneeded columns
+        columns_to_drop = [
+            "objectid",
+            "password_entry",
+            "logo",
+            "photos_please_upload",
+            "CreationDate",
+            "Creator",
+            "EditDate",
+            "Editor",
+        ]
+        responses.drop(columns=columns_to_drop, errors="ignore", inplace=True)
+
+        #: Rename columns to match the aliases in the survey, including numbering
         alias_mapper = {field["name"]: field["alias"] for field in feature_layer.properties.fields}
         new_column_names = self._map_aliases_to_columns(alias_mapper)
-        responses.rename(columns=new_column_names, inplace=True)
-        responses.drop(columns=["ObjectID"], inplace=True)
 
-        return responses
+        return responses.rename(columns=new_column_names)
 
     @staticmethod
     def _map_aliases_to_columns(alias_mapper_dict):
@@ -327,6 +346,35 @@ class Skid:
                 continue
 
         return alias_mapper_dict
+
+    #: TODO: Keeps adding two rows, overwriting the bottom two
+    def _load_responses_to_sheet(self, responses, lhd_abbreviation):
+        """Load the responses to the Google Sheet
+
+        Args:
+            responses (pd.DataFrame): The DataFrame containing the responses to load
+            lhd_abbreviation (str): The abbreviation for the local health department
+        """
+
+        self.skid_logger.debug(
+            "Loading responses to the %s sheet with id %s", lhd_abbreviation, self.lhd_sheet_ids[lhd_abbreviation]
+        )
+        gsheets_client = utils.authorize_pygsheets(self.secrets.SERVICE_ACCOUNT_JSON)
+        lhd_worksheet = gsheets_client.open_by_key(self.lhd_sheet_ids[lhd_abbreviation]).worksheet("index", 0)
+        live_dataframe = lhd_worksheet.get_as_df()
+        lhd_dataframe = responses[responses["Local Health District:"] == lhd_abbreviation].copy()
+        adds = lhd_dataframe[~lhd_dataframe["GlobalID"].isin(live_dataframe["GlobalID"])]
+        if not adds.empty:
+            lhd_worksheet.set_dataframe(
+                adds, (live_dataframe.shape[0] + 2, 1), copy_index=False, copy_head=False, extend=True, nan=""
+            )
+
+            add_count = adds.shape[0]
+            self.skid_logger.debug("Added %s new responses to the %s sheet", add_count, lhd_abbreviation)
+            return add_count
+
+        self.skid_logger.debug("No new responses to add to the %s sheet", lhd_abbreviation)
+        return 0
 
 
 @functions_framework.cloud_event
