@@ -20,9 +20,8 @@ from types import SimpleNamespace
 import arcgis
 import functions_framework
 import google.auth
-import pandas as pd
 from cloudevents.http import CloudEvent
-from palletjack import extract, load, transform, utils
+from palletjack import extract, utils
 from supervisor.message_handlers import SendGridHandler
 from supervisor.models import MessageDetails, Supervisor
 
