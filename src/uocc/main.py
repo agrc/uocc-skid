@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # * coding: utf8 *
 """
-Run the SKIDNAME script as a cloud function.
+Run the uocc-skid as a Cloud Run instance. Uses the entry point defined in setup.py and the Dockerfile.
 """
 
-import base64
 import json
 import logging
 import os
@@ -18,9 +17,7 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 
 import arcgis
-import functions_framework
 import google.auth
-from cloudevents.http import CloudEvent
 from palletjack import extract, utils
 from supervisor.message_handlers import SendGridHandler
 from supervisor.models import MessageDetails, Supervisor
@@ -146,6 +143,7 @@ class Skid:
         locations_df = self._add_lhd_by_county(locations_df)
         locations_df = self._clean_field_names(locations_df)
         locations_df = self._fix_apostrophes_bug(locations_df)
+        locations_df.sort_values(by=["FacilityName"], inplace=True)  #: Makes name list alphabetical in survey
         locations_without_ids = locations_df[locations_df["ID"].isna()]
 
         contacts_df = self._extract_contacts_from_sheet()
@@ -153,7 +151,7 @@ class Skid:
         contacts_df = self._fix_apostrophes_bug(contacts_df)
         contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
 
-        # update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
+        update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
 
         responses = self._extract_responses_from_agol()
 
@@ -195,10 +193,10 @@ class Skid:
             f"Contacts without IDs: {len(contacts_without_ids)}",
             "",
         ]
-        # if update_success:
-        #     summary_rows.append("Survey media folder updated successfully")
-        # else:
-        #     summary_rows.append("Survey media folder update failed")
+        if update_success:
+            summary_rows.append("Survey media folder updated successfully")
+        else:
+            summary_rows.append("Survey media folder update failed")
 
         summary_rows.append("")
         summary_rows.append("Responses loaded to sheets:")
@@ -307,7 +305,7 @@ class Skid:
 
         #: Overwrite the locations and contacts with the new data
         locations_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/locations_with_lhd.csv", index=False)
-        contacts_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/fake_uocc_contacts_with_id.csv", index=False)
+        contacts_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/uocc_contacts.csv", index=False)
 
         #: Remove old zip file to avoid conflicts
         os.remove(downloaded_zip)
@@ -393,33 +391,6 @@ class Skid:
 
         self.skid_logger.debug("No new responses to add to the %s sheet", lhd_abbreviation)
         return 0
-
-
-@functions_framework.cloud_event
-def subscribe(cloud_event: CloudEvent) -> None:
-    """Entry point for Google Cloud Function triggered by pub/sub event
-
-    Args:
-         cloud_event (CloudEvent):  The CloudEvent object with data specific to this type of
-                        event. The `type` field maps to
-                         `type.googleapis.com/google.pubsub.v1.PubsubMessage`.
-                        The `data` field maps to the PubsubMessage data
-                        in a base64-encoded string. The `attributes` field maps
-                        to the PubsubMessage attributes if any is present.
-    Returns:
-        None. The output is written to Cloud Logging.
-    """
-
-    #: This function must be called 'subscribe' to act as the Google Cloud Function entry point. It must accept the
-    #: CloudEvent object as the only argument.
-
-    #: You can get the message-body value from the Cloud Scheduler event sent via pub/sub to customize the run
-    if base64.b64decode(cloud_event.data["message"]["data"]).decode() == "foo":
-        pass
-
-    #: Call process() and any other functions you want to be run as part of the skid here.
-    uocc_skid = Skid()
-    uocc_skid.process()
 
 
 def entry():
