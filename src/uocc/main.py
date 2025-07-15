@@ -312,7 +312,7 @@ class Skid:
 
         #: Re-zip the survey form with the new data, update the AGOL item
         new_zip_name = survey_properties["title"]
-        new_zip = shutil.make_archive(new_zip_name, "zip", self.tempdir_path / "_survey")
+        new_zip = shutil.make_archive(self.tempdir_path / new_zip_name, "zip", self.tempdir_path / "_survey")
 
         update_success = survey_item.update({}, new_zip)
 
