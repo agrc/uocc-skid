@@ -160,9 +160,24 @@ class Skid:
 
         self.lhd_sheet_ids = {
             "BRHD": self.secrets.BRHD_SHEET_ID,
+            "CUHD": self.secrets.CUHD_SHEET_ID,
+            "DCHD": self.secrets.DCHD_SHEET_ID,
+            "SLCoHD": self.secrets.SLCOHD_SHEET_ID,
+            "SJHD": self.secrets.SJHD_SHEET_ID,
+            "SEUHD": self.secrets.SEUHD_SHEET_ID,
+            "SWUHD": self.secrets.SWUHD_SHEET_ID,
+            "SCHD": self.secrets.SCHD_SHEET_ID,
+            "TCoHD": self.secrets.TCOHD_SHEET_ID,
+            "TCHD": self.secrets.TCHD_SHEET_ID,
+            "UCHD": self.secrets.UCHD_SHEET_ID,
+            "WCHD": self.secrets.WCHD_SHEET_ID,
+            "WMHD": self.secrets.WMHD_SHEET_ID,
         }
 
-        self._load_responses_to_sheet(responses, "BRHD")
+        lhd_load_counts = []
+        for lhd_abbreviation in self.lhd_sheet_ids:
+            load_count = self._load_responses_to_sheet(responses, lhd_abbreviation)
+            lhd_load_counts.append(f"{lhd_abbreviation}: {load_count}")
 
         end = datetime.now()
 
@@ -179,11 +194,16 @@ class Skid:
             f"Locations without IDs: {len(locations_without_ids)}",
             f"Contacts extracted: {len(contacts_df)}",
             f"Contacts without IDs: {len(contacts_without_ids)}",
+            "",
         ]
-        if update_success:
-            summary_rows.append("Survey media folder updated successfully")
-        else:
-            summary_rows.append("Survey media folder update failed")
+        # if update_success:
+        #     summary_rows.append("Survey media folder updated successfully")
+        # else:
+        #     summary_rows.append("Survey media folder update failed")
+
+        summary_rows.append("")
+        summary_rows.append("Responses loaded to sheets:")
+        summary_rows.extend(lhd_load_counts)
 
         summary_message.message = "\n".join(summary_rows)
         summary_message.attachments = self.tempdir_path / self.log_name
@@ -347,7 +367,6 @@ class Skid:
 
         return alias_mapper_dict
 
-    #: TODO: Keeps adding two rows, overwriting the bottom two
     def _load_responses_to_sheet(self, responses, lhd_abbreviation):
         """Load the responses to the Google Sheet
 
