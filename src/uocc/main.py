@@ -18,6 +18,7 @@ from types import SimpleNamespace
 
 import arcgis
 import google.auth
+import pandas as pd
 from palletjack import extract, utils
 from supervisor.message_handlers import SendGridHandler
 from supervisor.models import MessageDetails, Supervisor
@@ -139,20 +140,6 @@ class Skid:
         #: Get our GIS object via the ArcGIS API for Python
         self.gis = arcgis.gis.GIS(config.AGOL_ORG, self.secrets.AGOL_USER, self.secrets.AGOL_PASSWORD)
 
-        locations_df = self._extract_locations_from_sheet()
-        locations_df = self._add_lhd_by_county(locations_df)
-        locations_df = self._clean_field_names(locations_df)
-        locations_df = self._fix_apostrophes_bug(locations_df)
-        locations_df.sort_values(by=["FacilityName"], inplace=True)  #: Makes name list alphabetical in survey
-        locations_without_ids = locations_df[locations_df["ID"].isna()]
-
-        contacts_df = self._extract_contacts_from_sheet()
-        contacts_df = self._clean_field_names(contacts_df)
-        contacts_df = self._fix_apostrophes_bug(contacts_df)
-        contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
-
-        update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
-
         responses = self._extract_responses_from_agol()
 
         self.lhd_sheet_ids = {
@@ -175,6 +162,31 @@ class Skid:
         for lhd_abbreviation in self.lhd_sheet_ids:
             load_count = self._load_responses_to_sheet(responses, lhd_abbreviation)
             lhd_load_counts.append(f"{lhd_abbreviation}: {load_count}")
+
+        existing_contacts_df = self._extract_contacts_from_sheet()
+        new_contacts_df = self._extract_contact_updates_from_responses(responses)
+        new_contacts_df = self._clean_contacts_dataframe(new_contacts_df)
+        updated_contacts_df = self._update_existing_contacts_dataframe(existing_contacts_df, new_contacts_df)
+        try:
+            self._load_updates_to_contacts_sheet(updated_contacts_df)
+            contact_update_status = "Contacts sheet updated successfully"
+        except Exception as e:
+            self.skid_logger.error("Error updating contacts sheet: %s", e)
+            contact_update_status = f"Contacts sheet update failed: {e}"
+
+        locations_df = self._extract_locations_from_sheet()
+        locations_df = self._add_lhd_by_county(locations_df)
+        locations_df = self._clean_field_names(locations_df)
+        locations_df = self._fix_apostrophes_bug(locations_df)
+        locations_df.sort_values(by=["FacilityName"], inplace=True)  #: Makes name list alphabetical in survey
+        locations_without_ids = locations_df[locations_df["ID"].isna()]
+
+        contacts_df = self._extract_contacts_from_sheet()
+        contacts_df = self._clean_field_names(contacts_df)
+        contacts_df = self._fix_apostrophes_bug(contacts_df)
+        contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
+
+        update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
 
         end = datetime.now()
 
@@ -201,6 +213,8 @@ class Skid:
         summary_rows.append("")
         summary_rows.append("Responses loaded to sheets:")
         summary_rows.extend(lhd_load_counts)
+        summary_rows.append("")
+        summary_rows.append(contact_update_status)
 
         summary_message.message = "\n".join(summary_rows)
         summary_message.attachments = self.tempdir_path / self.log_name
@@ -391,6 +405,89 @@ class Skid:
 
         self.skid_logger.debug("No new responses to add to the %s sheet", lhd_abbreviation)
         return 0
+
+    def _extract_contact_updates_from_responses(self, responses: pd.DataFrame) -> pd.DataFrame:
+        """Extract the contact updates from the responses DataFrame, only taking the latest update per ID
+
+        Args:
+            responses (pd.DataFrame): Responses loaded from AGOL
+
+        Returns:
+            pd.DataFrame: Responses filtered to rows with response flag set and only name/email columns
+        """
+
+        new_contact_info = responses[responses["Is this information still correct?"] == "no"][
+            ["UOCC Facility Code:", "UOCC Manager or Contact Name:", "UOCC Email Address:", "date_of_signature"]
+        ].copy()
+        new_contact_info.sort_values(by=["date_of_signature"], ascending=False, inplace=True)
+        new_contact_info.drop_duplicates(subset=["UOCC Facility Code:"], keep="first", inplace=True)
+        new_contact_info.drop(columns=["date_of_signature"], inplace=True)
+
+        return new_contact_info
+
+    def _clean_contacts_dataframe(self, new_contacts: pd.DataFrame) -> pd.DataFrame:
+        """Align new contacts dataframe for a df.update
+
+        Args:
+            new_contacts (pd.DataFrame): Contacts to update from responses
+
+        Returns:
+            pd.DataFrame: Columns renamed, types set, index set
+        """
+
+        survey_to_live_mapping = {
+            "UOCC Facility Code:": "ID#",
+            "UOCC Manager or Contact Name:": "UOCC Contact Name",
+            "UOCC Email Address:": "UOCC Email Address",
+        }
+        new_contacts.rename(columns=survey_to_live_mapping, inplace=True)
+        for column in new_contacts.columns:
+            new_contacts[column] = new_contacts[column].astype("object")
+
+        new_contacts.set_index("ID#", inplace=True)
+
+        return new_contacts
+
+    def _update_existing_contacts_dataframe(
+        self, live_contacts: pd.DataFrame, new_contacts: pd.DataFrame
+    ) -> pd.DataFrame:
+        """Update the live contacts dataframe with the new contacts dataframe
+
+        Args:
+            live_contacts (pd.DataFrame): The existing contacts dataframe from the contacts sheet
+            new_contacts (pd.DataFrame): The new contacts dataframe from the responses
+
+        Returns:
+            pd.DataFrame: The updated contacts dataframe
+        """
+
+        live_contacts.set_index("ID#", inplace=True)
+        live_contacts.update(new_contacts)
+
+        live_contacts.reset_index(inplace=True)
+
+        return live_contacts
+
+    def _load_updates_to_contacts_sheet(self, updated_contacts: pd.DataFrame):
+        """Load the updated contacts dataframe to the contacts sheet
+
+        Args:
+            updated_contacts (pd.DataFrame): The updated contacts dataframe
+        """
+
+        self.skid_logger.debug(
+            "Loading updated contacts to the contacts sheet with id %s", self.secrets.UOCC_CONTACTS_SHEET_ID
+        )
+        gsheets_client = utils.authorize_pygsheets(self.secrets.SERVICE_ACCOUNT_JSON)
+        contacts_worksheet = gsheets_client.open_by_key(self.secrets.UOCC_CONTACTS_SHEET_ID).worksheet("index", 0)
+        contacts_worksheet.set_dataframe(
+            updated_contacts,
+            (1, 1),
+            copy_index=False,
+            copy_head=True,
+            extend=True,
+            nan="",
+        )
 
 
 def entry():

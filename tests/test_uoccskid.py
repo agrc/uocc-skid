@@ -199,3 +199,174 @@ class TestQuestionsRenaming:
         new_mapping = main.Skid._map_aliases_to_columns(input_mapping)
 
         assert new_mapping == expected_mapping
+
+
+class TestContactUpdating:
+    def test_extract_contact_updates_from_responses_only_keeps_latest_update_per_id(self, mocker):
+        responses = pd.DataFrame(
+            {
+                "UOCC Facility Code:": ["UOCC-1234", "UOCC-5678", "UOCC-1234"],
+                "UOCC Manager or Contact Name:": ["Alice", "Bob", "Charlie"],
+                "UOCC Email Address:": ["foo@bar.com", "bar@baz.com", "baz@bar.com"],
+                "date_of_signature": ["2023-01-01", "2023-01-02", "2023-01-03"],
+                "Is this information still correct?": ["no", "no", "no"],
+            }
+        )
+        responses["date_of_signature"] = responses["date_of_signature"].astype("datetime64[ns]")
+
+        expected_output = pd.DataFrame(
+            {
+                "UOCC Facility Code:": ["UOCC-1234", "UOCC-5678"],
+                "UOCC Manager or Contact Name:": ["Charlie", "Bob"],
+                "UOCC Email Address:": ["baz@bar.com", "bar@baz.com"],
+            },
+            index=[2, 1],
+        )
+
+        output = main.Skid._extract_contact_updates_from_responses(mocker.Mock, responses)
+
+        pd.testing.assert_frame_equal(expected_output, output)
+
+    def test_clean_contact_dataframe_renames_columns_and_sets_types(self, mocker):
+        new_contacts = pd.DataFrame(
+            {
+                "UOCC Facility Code:": ["UOCC-1234", "UOCC-5678"],
+                "UOCC Manager or Contact Name:": ["Charlie", "Bob"],
+                "UOCC Email Address:": ["foo@bar.com", "bar@baz.com"],
+            }
+        )
+        new_contacts["UOCC Facility Code:"] = new_contacts["UOCC Facility Code:"].astype("string")
+        new_contacts["UOCC Manager or Contact Name:"] = new_contacts["UOCC Manager or Contact Name:"].astype("string")
+        new_contacts["UOCC Email Address:"] = new_contacts["UOCC Email Address:"].astype("string")
+
+        expected_output = pd.DataFrame(
+            {
+                "UOCC Contact Name": ["Charlie", "Bob"],
+                "UOCC Email Address": ["foo@bar.com", "bar@baz.com"],
+            },
+            index=["UOCC-1234", "UOCC-5678"],
+        )
+        expected_output.index.name = "ID#"
+        expected_output.index = expected_output.index.astype("object")
+        expected_output["UOCC Contact Name"] = expected_output["UOCC Contact Name"].astype("object")
+        expected_output["UOCC Email Address"] = expected_output["UOCC Email Address"].astype("object")
+
+        output = main.Skid._clean_contacts_dataframe(mocker.Mock, new_contacts)
+        pd.testing.assert_frame_equal(expected_output, output)
+
+    def test_update_existing_contacts_dataframe_updates_and_handles_other_fields(self, mocker):
+        existing_contacts = pd.DataFrame(
+            {
+                "ID#": ["UOCC-1234", "UOCC-5678", "UOCC-9101"],
+                "Facility Name": ["Loc1", "Loc2", "Loc3"],
+                "Local Health Department": ["X", "Y", "Z"],
+                "UOCC Contact Name": ["Alice", "Bob", "Eve"],
+                "UOCC Email Address": ["boo", "bar", "baz"],
+                "Corporate Contact Name": ["C1", "C2", "C3"],
+                "Corporate Email Address": ["c1", "c2", "c3"],
+            }
+        )
+        new_contacts = pd.DataFrame(
+            {
+                "UOCC Contact Name": ["Charlie", "Bob"],
+                "UOCC Email Address": ["charlie", "bob"],
+            },
+            index=["UOCC-1234", "UOCC-5678"],
+        )
+        new_contacts.index.name = "ID#"
+        new_contacts.index = new_contacts.index.astype("object")
+        for col in new_contacts.columns:
+            new_contacts[col] = new_contacts[col].astype("object")
+
+        expected_output = pd.DataFrame(
+            {
+                "ID#": ["UOCC-1234", "UOCC-5678", "UOCC-9101"],
+                "Facility Name": ["Loc1", "Loc2", "Loc3"],
+                "Local Health Department": ["X", "Y", "Z"],
+                "UOCC Contact Name": ["Charlie", "Bob", "Eve"],
+                "UOCC Email Address": ["charlie", "bob", "baz"],
+                "Corporate Contact Name": ["C1", "C2", "C3"],
+                "Corporate Email Address": ["c1", "c2", "c3"],
+            }
+        )
+
+        output = main.Skid._update_existing_contacts_dataframe(mocker.Mock, existing_contacts, new_contacts)
+        pd.testing.assert_frame_equal(expected_output, output)
+
+    def test_update_existing_contacts_dataframe_does_not_add_new_contact(self, mocker):
+        existing_contacts = pd.DataFrame(
+            {
+                "ID#": ["UOCC-1234", "UOCC-5678"],
+                "Facility Name": ["Loc1", "Loc2"],
+                "Local Health Department": ["X", "Y"],
+                "UOCC Contact Name": ["Alice", "Bob"],
+                "UOCC Email Address": ["boo", "bar"],
+                "Corporate Contact Name": ["C1", "C2"],
+                "Corporate Email Address": ["c1", "c2"],
+            }
+        )
+        new_contacts = pd.DataFrame(
+            {
+                "UOCC Contact Name": ["Charlie", "David"],
+                "UOCC Email Address": ["charlie", "david"],
+            },
+            index=["UOCC-1234", "UOCC-9101"],  # UOCC-9101 does not exist in existing_contacts
+        )
+        new_contacts.index.name = "ID#"
+        new_contacts.index = new_contacts.index.astype("object")
+        for col in new_contacts.columns:
+            new_contacts[col] = new_contacts[col].astype("object")
+
+        expected_output = pd.DataFrame(
+            {
+                "ID#": ["UOCC-1234", "UOCC-5678"],
+                "Facility Name": ["Loc1", "Loc2"],
+                "Local Health Department": ["X", "Y"],
+                "UOCC Contact Name": ["Charlie", "Bob"],
+                "UOCC Email Address": ["charlie", "bar"],
+                "Corporate Contact Name": ["C1", "C2"],
+                "Corporate Email Address": ["c1", "c2"],
+            }
+        )
+
+        output = main.Skid._update_existing_contacts_dataframe(mocker.Mock, existing_contacts, new_contacts)
+        pd.testing.assert_frame_equal(expected_output, output)
+
+    def test_update_existing_contacts_dataframe_handles_missing_corporate_values(self, mocker):
+        existing_contacts = pd.DataFrame(
+            {
+                "ID#": ["UOCC-1234", "UOCC-5678"],
+                "Facility Name": ["Loc1", "Loc2"],
+                "Local Health Department": ["X", "Y"],
+                "UOCC Contact Name": ["Alice", "Bob"],
+                "UOCC Email Address": ["boo", "bar"],
+                "Corporate Contact Name": [None, "C2"],
+                "Corporate Email Address": [None, "c2"],
+            }
+        )
+        new_contacts = pd.DataFrame(
+            {
+                "UOCC Contact Name": ["Charlie", "David"],
+                "UOCC Email Address": ["charlie", "david"],
+            },
+            index=["UOCC-1234", "UOCC-5678"],
+        )
+        new_contacts.index.name = "ID#"
+        new_contacts.index = new_contacts.index.astype("object")
+        for col in new_contacts.columns:
+            new_contacts[col] = new_contacts[col].astype("object")
+
+        expected_output = pd.DataFrame(
+            {
+                "ID#": ["UOCC-1234", "UOCC-5678"],
+                "Facility Name": ["Loc1", "Loc2"],
+                "Local Health Department": ["X", "Y"],
+                "UOCC Contact Name": ["Charlie", "David"],
+                "UOCC Email Address": ["charlie", "david"],
+                "Corporate Contact Name": [None, "C2"],
+                "Corporate Email Address": [None, "c2"],
+            }
+        )
+
+        output = main.Skid._update_existing_contacts_dataframe(mocker.Mock, existing_contacts, new_contacts)
+        pd.testing.assert_frame_equal(expected_output, output)
