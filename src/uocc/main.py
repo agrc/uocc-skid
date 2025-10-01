@@ -461,10 +461,18 @@ class Skid:
             pd.DataFrame: The updated contacts dataframe
         """
 
+        #: get so we can return the ID column to the right place after the reindex
+        id_column_index = live_contacts.columns.get_loc("ID#")
+
         live_contacts.set_index("ID#", inplace=True)
         live_contacts.update(new_contacts)
 
         live_contacts.reset_index(inplace=True)
+
+        #: Reshuffle ID column back to original location
+        cols = live_contacts.columns.tolist()
+        cols.insert(id_column_index, cols.pop(cols.index("ID#")))
+        live_contacts = live_contacts.reindex(columns=cols)
 
         return live_contacts
 
