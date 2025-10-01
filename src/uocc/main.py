@@ -181,8 +181,8 @@ class Skid:
         locations_df.sort_values(by=["FacilityName"], inplace=True)  #: Makes name list alphabetical in survey
         locations_without_ids = locations_df[locations_df["ID"].isna()]
 
-        contacts_df = self._extract_contacts_from_sheet()
-        contacts_df = self._clean_field_names(contacts_df)
+        #: Can reuse the updated contacts instead of getting it from the sheet again
+        contacts_df = self._clean_field_names(updated_contacts_df)
         contacts_df = self._fix_apostrophes_bug(contacts_df)
         contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
 
