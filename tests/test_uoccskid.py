@@ -257,8 +257,8 @@ class TestContactUpdating:
     def test_update_existing_contacts_dataframe_updates_and_handles_other_fields(self, mocker):
         existing_contacts = pd.DataFrame(
             {
-                "ID#": ["UOCC-1234", "UOCC-5678", "UOCC-9101"],
                 "Facility Name": ["Loc1", "Loc2", "Loc3"],
+                "ID#": ["UOCC-1234", "UOCC-5678", "UOCC-9101"],
                 "Local Health Department": ["X", "Y", "Z"],
                 "UOCC Contact Name": ["Alice", "Bob", "Eve"],
                 "UOCC Email Address": ["boo", "bar", "baz"],
@@ -280,8 +280,8 @@ class TestContactUpdating:
 
         expected_output = pd.DataFrame(
             {
-                "ID#": ["UOCC-1234", "UOCC-5678", "UOCC-9101"],
                 "Facility Name": ["Loc1", "Loc2", "Loc3"],
+                "ID#": ["UOCC-1234", "UOCC-5678", "UOCC-9101"],
                 "Local Health Department": ["X", "Y", "Z"],
                 "UOCC Contact Name": ["Charlie", "Bob", "Eve"],
                 "UOCC Email Address": ["charlie", "bob", "baz"],
@@ -296,8 +296,8 @@ class TestContactUpdating:
     def test_update_existing_contacts_dataframe_does_not_add_new_contact(self, mocker):
         existing_contacts = pd.DataFrame(
             {
-                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Facility Name": ["Loc1", "Loc2"],
+                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Local Health Department": ["X", "Y"],
                 "UOCC Contact Name": ["Alice", "Bob"],
                 "UOCC Email Address": ["boo", "bar"],
@@ -319,8 +319,8 @@ class TestContactUpdating:
 
         expected_output = pd.DataFrame(
             {
-                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Facility Name": ["Loc1", "Loc2"],
+                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Local Health Department": ["X", "Y"],
                 "UOCC Contact Name": ["Charlie", "Bob"],
                 "UOCC Email Address": ["charlie", "bar"],
@@ -335,8 +335,8 @@ class TestContactUpdating:
     def test_update_existing_contacts_dataframe_handles_missing_corporate_values(self, mocker):
         existing_contacts = pd.DataFrame(
             {
-                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Facility Name": ["Loc1", "Loc2"],
+                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Local Health Department": ["X", "Y"],
                 "UOCC Contact Name": ["Alice", "Bob"],
                 "UOCC Email Address": ["boo", "bar"],
@@ -358,8 +358,8 @@ class TestContactUpdating:
 
         expected_output = pd.DataFrame(
             {
-                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Facility Name": ["Loc1", "Loc2"],
+                "ID#": ["UOCC-1234", "UOCC-5678"],
                 "Local Health Department": ["X", "Y"],
                 "UOCC Contact Name": ["Charlie", "David"],
                 "UOCC Email Address": ["charlie", "david"],
