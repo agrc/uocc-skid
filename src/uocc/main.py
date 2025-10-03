@@ -163,16 +163,7 @@ class Skid:
             load_count = self._load_responses_to_sheet(responses, lhd_abbreviation)
             lhd_load_counts.append(f"{lhd_abbreviation}: {load_count}")
 
-        existing_contacts_df = self._extract_contacts_from_sheet()
-        new_contacts_df = self._extract_contact_updates_from_responses(responses)
-        new_contacts_df = self._clean_contacts_dataframe(new_contacts_df)
-        updated_contacts_df = self._update_existing_contacts_dataframe(existing_contacts_df, new_contacts_df)
-        try:
-            self._load_updates_to_contacts_sheet(updated_contacts_df)
-            contact_update_status = "Contacts sheet updated successfully"
-        except Exception as e:
-            self.skid_logger.error("Error updating contacts sheet: %s", e)
-            contact_update_status = f"Contacts sheet update failed: {e}"
+        updated_contacts_df, contact_update_status = self.update_contacts_from_responses(responses)
 
         locations_df = self._extract_locations_from_sheet()
         locations_df = self._add_lhd_by_county(locations_df)
@@ -405,6 +396,25 @@ class Skid:
 
         self.skid_logger.debug("No new responses to add to the %s sheet", lhd_abbreviation)
         return 0
+
+    def update_contacts_from_responses(self, responses: pd.DataFrame) -> tuple[pd.DataFrame, str]:
+        """Master method for the contact update process"""
+
+        existing_contacts_df = self._extract_contacts_from_sheet()
+        new_contacts_df = self._extract_contact_updates_from_responses(responses)
+        if new_contacts_df.empty:
+            contact_update_status = "No contact updates found in responses"
+            return existing_contacts_df, contact_update_status
+
+        new_contacts_df = self._clean_contacts_dataframe(new_contacts_df)
+        updated_contacts_df = self._update_existing_contacts_dataframe(existing_contacts_df, new_contacts_df)
+        try:
+            self._load_updates_to_contacts_sheet(updated_contacts_df)
+            contact_update_status = "Contacts sheet updated successfully"
+        except Exception as e:
+            self.skid_logger.error("Error updating contacts sheet: %s", e)
+            contact_update_status = f"Contacts sheet update failed: {e}"
+        return updated_contacts_df, contact_update_status
 
     def _extract_contact_updates_from_responses(self, responses: pd.DataFrame) -> pd.DataFrame:
         """Extract the contact updates from the responses DataFrame, only taking the latest update per ID
