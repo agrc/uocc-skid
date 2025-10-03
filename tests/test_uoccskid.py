@@ -227,6 +227,35 @@ class TestContactUpdating:
 
         pd.testing.assert_frame_equal(expected_output, output)
 
+    def test_extract_contact_updates_returns_empty_dataframe_if_no_updates(self, mocker):
+        responses = pd.DataFrame(
+            {
+                "UOCC Facility Code:": ["UOCC-1234", "UOCC-5678", "UOCC-1234"],
+                "UOCC Manager or Contact Name:": ["Alice", "Bob", "Charlie"],
+                "UOCC Email Address:": ["foo@bar.com", "bar@baz.com", "baz@bar.com"],
+                "date_of_signature": ["2023-01-01", "2023-01-02", "2023-01-03"],
+                "Is this information still correct?": ["yes", "yes", "yes"],
+            }
+        )
+        responses["date_of_signature"] = responses["date_of_signature"].astype("datetime64[ns]")
+
+        expected_output = pd.DataFrame(
+            {
+                "UOCC Facility Code:": [],
+                "UOCC Manager or Contact Name:": [],
+                "UOCC Email Address:": [],
+            },
+        )
+        expected_output["UOCC Facility Code:"] = expected_output["UOCC Facility Code:"].astype("object")
+        expected_output["UOCC Manager or Contact Name:"] = expected_output["UOCC Manager or Contact Name:"].astype(
+            "object"
+        )
+        expected_output["UOCC Email Address:"] = expected_output["UOCC Email Address:"].astype("object")
+
+        output = main.Skid._extract_contact_updates_from_responses(mocker.Mock, responses)
+
+        pd.testing.assert_frame_equal(expected_output, output)
+
     def test_clean_contact_dataframe_renames_columns_and_sets_types(self, mocker):
         new_contacts = pd.DataFrame(
             {
@@ -370,3 +399,63 @@ class TestContactUpdating:
 
         output = main.Skid._update_existing_contacts_dataframe(mocker.Mock, existing_contacts, new_contacts)
         pd.testing.assert_frame_equal(expected_output, output)
+
+    def test_update_contacts_from_responses_no_updates_returns_original_contacts(self, mocker):
+        existing_contacts = pd.DataFrame(
+            {
+                "Facility Name": ["Loc1", "Loc2"],
+                "ID#": ["UOCC-1234", "UOCC-5678"],
+                "Local Health Department": ["X", "Y"],
+                "UOCC Contact Name": ["Alice", "Bob"],
+                "UOCC Email Address": ["boo", "bar"],
+                "Corporate Contact Name": ["C1", "C2"],
+                "Corporate Email Address": ["c1", "c2"],
+            }
+        )
+        expected_output = existing_contacts.copy()
+
+        skid_mock = mocker.Mock()
+        skid_mock._extract_contacts_from_sheet.return_value = existing_contacts
+        skid_mock._extract_contact_updates_from_responses.return_value = pd.DataFrame(
+            {
+                "UOCC Facility Code:": [],
+                "UOCC Manager or Contact Name:": [],
+                "UOCC Email Address:": [],
+            },
+        )
+
+        updated_contacts, update_status = main.Skid.update_contacts_from_responses(skid_mock, mocker.Mock())
+
+        pd.testing.assert_frame_equal(expected_output, updated_contacts)
+        assert update_status == "No contact updates found in responses"
+        skid_mock._clean_contacts_dataframe.assert_not_called()
+        skid_mock._update_existing_contacts_dataframe.assert_not_called()
+        skid_mock._load_updates_to_contacts_sheet.assert_not_called()
+
+    def test_update_contacts_from_responses_logs_update_error_and_returns(self, mocker):
+        existing_contacts = pd.DataFrame(
+            {
+                "Facility Name": ["Loc1", "Loc2"],
+                "ID#": ["UOCC-1234", "UOCC-5678"],
+                "Local Health Department": ["X", "Y"],
+                "UOCC Contact Name": ["Alice", "Bob"],
+                "UOCC Email Address": ["boo", "bar"],
+                "Corporate Contact Name": ["C1", "C2"],
+                "Corporate Email Address": ["c1", "c2"],
+            }
+        )
+
+        skid_mock = mocker.Mock()
+        skid_mock._extract_contact_updates_from_responses.return_value = pd.DataFrame(
+            {"foo": ["bar"]}  # dummy non-empty dataframe to pass empty check
+        )
+        skid_mock._load_updates_to_contacts_sheet.side_effect = Exception("Loading error")
+        skid_mock._update_existing_contacts_dataframe.return_value = existing_contacts.copy()
+
+        updated_contacts, update_status = main.Skid.update_contacts_from_responses(skid_mock, mocker.Mock())
+
+        pd.testing.assert_frame_equal(existing_contacts, updated_contacts)
+        assert update_status == "Contacts sheet update failed: Loading error"
+
+        #: Getting the message is being tricky, debug shows its got the right args
+        skid_mock.skid_logger.error.assert_called_once()
