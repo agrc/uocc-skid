@@ -1,0 +1,2296 @@
+{
+    "name": "UOCC pipeline no sheet",
+    "flow": [
+        {
+            "id": 1,
+            "module": "survey123:listenNewSubmit",
+            "version": 1,
+            "parameters": {
+                "__IMTHOOK__": 928231
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": -3,
+                    "y": 152
+                },
+                "restore": {
+                    "parameters": {
+                        "__IMTHOOK__": {
+                            "data": {
+                                "editable": "false"
+                            },
+                            "label": "current UOCC pipeline (no sheet)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTHOOK__",
+                        "type": "hook:survey123-161690",
+                        "label": "Webhook",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "eventType",
+                        "type": "text",
+                        "label": "Event Type"
+                    },
+                    {
+                        "name": "portalInfo",
+                        "spec": [
+                            {
+                                "name": "token",
+                                "type": "text",
+                                "label": "Token"
+                            },
+                            {
+                                "name": "url",
+                                "type": "text",
+                                "label": "URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Portal Info"
+                    },
+                    {
+                        "name": "userInfo",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "text",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "firstName",
+                                "type": "text",
+                                "label": "First Name"
+                            },
+                            {
+                                "name": "lastName",
+                                "type": "text",
+                                "label": "Last Name"
+                            },
+                            {
+                                "name": "fullName",
+                                "type": "text",
+                                "label": "Full Name"
+                            },
+                            {
+                                "name": "username",
+                                "type": "text",
+                                "label": "Username"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "User Info"
+                    },
+                    {
+                        "name": "surveyInfo",
+                        "spec": [
+                            {
+                                "name": "formItemId",
+                                "type": "text",
+                                "label": "Form Item Id"
+                            },
+                            {
+                                "name": "formTitle",
+                                "type": "text",
+                                "label": "Form Title"
+                            },
+                            {
+                                "name": "serviceItemId",
+                                "type": "text",
+                                "label": "Feature Service Item Id"
+                            },
+                            {
+                                "name": "serviceUrl",
+                                "type": "text",
+                                "label": "Feature Service URL"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Survey Info"
+                    },
+                    {
+                        "name": "response",
+                        "spec": {
+                            "spec": [
+                                {
+                                    "name": "id",
+                                    "type": "number",
+                                    "label": "ID"
+                                },
+                                {
+                                    "name": "addResults",
+                                    "spec": {
+                                        "spec": [
+                                            {
+                                                "name": "globalId",
+                                                "type": "text",
+                                                "label": "globalId"
+                                            },
+                                            {
+                                                "name": "objectId",
+                                                "type": "number",
+                                                "label": "objectId"
+                                            },
+                                            {
+                                                "name": "uniqueId",
+                                                "type": "number",
+                                                "label": "uniqueId"
+                                            },
+                                            {
+                                                "name": "success",
+                                                "type": "boolean",
+                                                "label": "Success"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    "type": "array",
+                                    "label": "addResults"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "Response"
+                    },
+                    {
+                        "name": "feature",
+                        "spec": [
+                            {
+                                "name": "attributes",
+                                "spec": [
+                                    {
+                                        "name": "password_entry",
+                                        "type": "text",
+                                        "label": "Please enter the password provided by your local health district to access this form."
+                                    },
+                                    {
+                                        "name": "inspectorname",
+                                        "type": "text",
+                                        "label": "Inspector Name:"
+                                    },
+                                    {
+                                        "name": "datewheninspected",
+                                        "type": "number",
+                                        "label": "Date of Inspection:"
+                                    },
+                                    {
+                                        "name": "collection_period",
+                                        "type": "text",
+                                        "label": "Collection Period:"
+                                    },
+                                    {
+                                        "name": "collection_year",
+                                        "type": "number",
+                                        "label": "Collection Year:"
+                                    },
+                                    {
+                                        "name": "logo",
+                                        "type": "text",
+                                        "label": "jr://images/wmrc_logo_smaller.png"
+                                    },
+                                    {
+                                        "name": "lhd",
+                                        "type": "text",
+                                        "label": "Local Health District:"
+                                    },
+                                    {
+                                        "name": "select_the_facility",
+                                        "type": "text",
+                                        "label": "Select the Facility:"
+                                    },
+                                    {
+                                        "name": "id_",
+                                        "type": "text",
+                                        "label": "UOCC Facility Code:"
+                                    },
+                                    {
+                                        "name": "street",
+                                        "type": "text",
+                                        "label": "Street Address:"
+                                    },
+                                    {
+                                        "name": "city",
+                                        "type": "text",
+                                        "label": "City:"
+                                    },
+                                    {
+                                        "name": "state",
+                                        "type": "text",
+                                        "label": "State:"
+                                    },
+                                    {
+                                        "name": "zip_code",
+                                        "type": "number",
+                                        "label": "ZIP Code:"
+                                    },
+                                    {
+                                        "name": "uocc_contact_name",
+                                        "type": "text",
+                                        "label": "UOCC Manager or Contact Name:"
+                                    },
+                                    {
+                                        "name": "uocc_email_address",
+                                        "type": "text",
+                                        "label": "UOCC Email Address:"
+                                    },
+                                    {
+                                        "name": "phone_no",
+                                        "type": "text",
+                                        "label": "UOCC Phone Number:"
+                                    },
+                                    {
+                                        "name": "website",
+                                        "type": "text",
+                                        "label": "UOCC Website:"
+                                    },
+                                    {
+                                        "name": "facility_type",
+                                        "type": "text",
+                                        "label": "UOCC Type:"
+                                    },
+                                    {
+                                        "name": "info_still_correct",
+                                        "type": "text",
+                                        "label": "Is this information still correct?"
+                                    },
+                                    {
+                                        "name": "ownership",
+                                        "type": "text",
+                                        "label": "1. Is the UOCC under the same ownership as it was during the last inspection?"
+                                    },
+                                    {
+                                        "name": "new_owner",
+                                        "type": "text",
+                                        "label": "Has the new owner applied to be a UOCC?"
+                                    },
+                                    {
+                                        "name": "provide_application",
+                                        "type": "text",
+                                        "label": "Please provide them with a UOCC application."
+                                    },
+                                    {
+                                        "name": "comments_ownership",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "sign",
+                                        "type": "text",
+                                        "label": "2. Does the UOCC have a collection sign clearly posted at the main entrance?"
+                                    },
+                                    {
+                                        "name": "provide_sign",
+                                        "type": "text",
+                                        "label": "Please provide a sign and have the UOCC post it where it can be seen by the public."
+                                    },
+                                    {
+                                        "name": "comments_sign",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "qr_system",
+                                        "type": "text",
+                                        "label": "3. Is the UOCC using the QR Code program to log used oil?"
+                                    },
+                                    {
+                                        "name": "explain_qr_system",
+                                        "type": "text",
+                                        "label": "Please explain the QR Code system, present the UOCC Training Video, provide a QR Code flyer from Google Drive, then request DWMRC assistance."
+                                    },
+                                    {
+                                        "name": "comments_qrsystem",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "verification",
+                                        "type": "text",
+                                        "label": "4. Does the UOCC verify used oil being poured into the tank(s)?"
+                                    },
+                                    {
+                                        "name": "comments_verification",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "orphan_oil",
+                                        "type": "text",
+                                        "label": "5. Is orphan oil being recorded correctly? (Using the QR Code system)"
+                                    },
+                                    {
+                                        "name": "comments_orphan_oil",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "uocc_type",
+                                        "type": "text",
+                                        "label": "6. Does the UOCC accept used oil only from acceptable generators? (Type A: DIYers; Type B: DIYers/farmers; Type C: DIYers/farmers/businesses; Type D: businesses)"
+                                    },
+                                    {
+                                        "name": "comments_used_oil",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "contamination",
+                                        "type": "text",
+                                        "label": "7. Does the UOCC reject contaminated used oil?"
+                                    },
+                                    {
+                                        "name": "contamination_usedoil",
+                                        "type": "text",
+                                        "label": "7a. If solvents, hazardous waste, or other substances are mixed with used oil, does the UOCC know what to do with contaminated used oil?"
+                                    },
+                                    {
+                                        "name": "dwmrc_assist_disposal",
+                                        "type": "text",
+                                        "label": "Please request DWMRC assistance at the end of this form (select the 'request assistance' option on the last page) for disposal options."
+                                    },
+                                    {
+                                        "name": "comments_contamination",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "transportation",
+                                        "type": "text",
+                                        "label": "8. Does the UOCC use a Utah permitted used oil transporter to ship used oil off-site?"
+                                    },
+                                    {
+                                        "name": "transportation_no",
+                                        "type": "text",
+                                        "label": "Please provide a <a href=\"https://lf-public.deq.utah.gov/WebLink/DocView.aspx?id=433172&repo=Public&searchid=8fa55aea-3788-44df-9958-8b36f155966b\" target=\"_blank\"> current list </a> of used oil transporters permitted by the State. If the UOCC is self-transporting used oil, include additional information (e.g. own vehicles, to an aggregation point, etc.)"
+                                    },
+                                    {
+                                        "name": "comments_transportation",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "records",
+                                        "type": "text",
+                                        "label": "9. Does the UOCC keep shipping and collection records for 3 years, even if self-transporting? (e.g. electronic or paper)"
+                                    },
+                                    {
+                                        "name": "comments_records",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "spill_plan",
+                                        "type": "text",
+                                        "label": "10. Is the Emergency Spill Plan posted near the used oil storage area?"
+                                    },
+                                    {
+                                        "name": "spill_plan_employees",
+                                        "type": "text",
+                                        "label": "10a. Do UOCC employees know what to do in case of a used oil spill?"
+                                    },
+                                    {
+                                        "name": "spill_plan_copy",
+                                        "type": "text",
+                                        "label": "Please provide a copy of the <a href=\"https://lf-public.deq.utah.gov/WebLink/ElectronicFile.aspx?docid=537916&eqdocs=DSHW-2025-000747\" target=\"_blank\"> DWMRC template Emergency Spill Plan </a>."
+                                    },
+                                    {
+                                        "name": "comments_spill_plan",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "spill_materials",
+                                        "type": "text",
+                                        "label": "11. Are spill cleanup materials easily accessible to employees? (e.g. close to used oil storage area)"
+                                    },
+                                    {
+                                        "name": "comments_spill_materials",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "spills",
+                                        "type": "text",
+                                        "label": "12. Is the UOCC free from signs of used oil spills? (e.g. large stains on floors and/or soil)"
+                                    },
+                                    {
+                                        "name": "comments_spills",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "tank_condition",
+                                        "type": "text",
+                                        "label": "13. Are used oil tank(s) and container(s) in good condition, not leaking, and closed during storage except when adding/removing used oil? (e.g. funnels closed or removed after use)"
+                                    },
+                                    {
+                                        "name": "comments_tank_condition",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "labels",
+                                        "type": "text",
+                                        "label": "14. Are used oil tank(s) and container(s) clearly labeled or marked with the words \"Used Oil\"?"
+                                    },
+                                    {
+                                        "name": "comments_labels",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "tank_security",
+                                        "type": "text",
+                                        "label": "15. Are tank(s)/container(s) secured from the public? (e.g. locked funnel, inside locked fence or building)"
+                                    },
+                                    {
+                                        "name": "comments_tank_security",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "access_tanks",
+                                        "type": "text",
+                                        "label": "16. Is access to tank(s) clutter free? It should be safe and easy to pour used oil into tank(s) and accessible to emergency personnel."
+                                    },
+                                    {
+                                        "name": "comments_access_tanks",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "containers",
+                                        "type": "text",
+                                        "label": "17. Is used oil transferred into the tank(s) immediately?"
+                                    },
+                                    {
+                                        "name": "containers_good_condition",
+                                        "type": "text",
+                                        "label": "17a. If not, are container(s) in good condition, closed, labeled \"Used Oil\" and stored in secondary containment?"
+                                    },
+                                    {
+                                        "name": "comments_containers",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "secondary_containment",
+                                        "type": "text",
+                                        "label": "18. If applicable, is secondary containment free from used oil, water and debris? (e.g. single-walled tanks)"
+                                    },
+                                    {
+                                        "name": "comments_secondary_containment",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "filters",
+                                        "type": "text",
+                                        "label": "19. Does the UOCC collect used oil filters?"
+                                    },
+                                    {
+                                        "name": "drain_method",
+                                        "type": "text",
+                                        "label": "19a. Are these filters punctured, crushed or dismantled, and gravity hot-drained? (at least 12 hours at &gt;60° F)"
+                                    },
+                                    {
+                                        "name": "comments_filters",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "on_site_burning",
+                                        "type": "text",
+                                        "label": "20. If the UOCC burns used oil (self-generated, DIYer, and farmer), does it comply with the on-site burning requirements?"
+                                    },
+                                    {
+                                        "name": "on_site_burning_businesses",
+                                        "type": "text",
+                                        "label": "20a. If the UOCC burns used oil from businesses (UOCC Types C and D), is the used oil certified as on-specification by a registered Used Oil Marketer?"
+                                    },
+                                    {
+                                        "name": "comments_on_site_burning",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "photos",
+                                        "type": "text",
+                                        "label": "21. When applicable, were photos taken of any compliance issues? (e.g. storage tank/areas, spills, no spill material/container)"
+                                    },
+                                    {
+                                        "name": "photos_please_upload",
+                                        "type": "text",
+                                        "label": "Please attach any and all photos from the inspection to the bottom of this page."
+                                    },
+                                    {
+                                        "name": "comments_photos",
+                                        "type": "text",
+                                        "label": "Comments"
+                                    },
+                                    {
+                                        "name": "other_issues",
+                                        "type": "text",
+                                        "label": "22. Describe any other UOCC or used oil generator non-compliance issues that need to be addressed."
+                                    },
+                                    {
+                                        "name": "assistance",
+                                        "type": "text",
+                                        "label": "Request DWMRC Assistance?"
+                                    },
+                                    {
+                                        "name": "note_assistance",
+                                        "type": "text",
+                                        "label": "Once you have submitted this form, an automated email will be sent to representatives at DWMRC. You will be contacted via your employee email."
+                                    },
+                                    {
+                                        "name": "employee_email",
+                                        "type": "text",
+                                        "label": "Inspector Email:"
+                                    },
+                                    {
+                                        "name": "time_traveling",
+                                        "type": "number",
+                                        "label": "Time Spent Traveling (in minutes):"
+                                    },
+                                    {
+                                        "name": "time_inspecting",
+                                        "type": "number",
+                                        "label": "Time Spent Inspection (in minutes):"
+                                    },
+                                    {
+                                        "name": "signature",
+                                        "type": "text",
+                                        "label": "By typing my name below, I certify the information in this form submission is true and correct."
+                                    },
+                                    {
+                                        "name": "date_of_signature",
+                                        "type": "number",
+                                        "label": "date_of_signature"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "attributes"
+                            },
+                            {
+                                "name": "geometry",
+                                "spec": [
+                                    {
+                                        "name": "geometryType",
+                                        "type": "text",
+                                        "label": "geometryType"
+                                    },
+                                    {
+                                        "name": "x",
+                                        "type": "number",
+                                        "label": "X"
+                                    },
+                                    {
+                                        "name": "y",
+                                        "type": "number",
+                                        "label": "Y"
+                                    },
+                                    {
+                                        "name": "spatialReference",
+                                        "spec": [
+                                            {
+                                                "name": "wkid",
+                                                "type": "number",
+                                                "label": "wkid"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Spatial Reference"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "geometry"
+                            },
+                            {
+                                "name": "layerInfo",
+                                "spec": [
+                                    {
+                                        "name": "globalIdField",
+                                        "type": "text",
+                                        "label": "globalIdField"
+                                    },
+                                    {
+                                        "name": "id",
+                                        "type": "number",
+                                        "label": "id"
+                                    },
+                                    {
+                                        "name": "name",
+                                        "type": "text",
+                                        "label": "name"
+                                    },
+                                    {
+                                        "name": "objectIdField",
+                                        "type": "text",
+                                        "label": "objectIdField"
+                                    },
+                                    {
+                                        "name": "relationships",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "cardinality",
+                                                    "type": "text",
+                                                    "label": "cardinality"
+                                                },
+                                                {
+                                                    "name": "composite",
+                                                    "type": "boolean",
+                                                    "label": "composite"
+                                                },
+                                                {
+                                                    "name": "id",
+                                                    "type": "number",
+                                                    "label": "id"
+                                                },
+                                                {
+                                                    "name": "keyField",
+                                                    "type": "text",
+                                                    "label": "keyField"
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "type": "text",
+                                                    "label": "name"
+                                                },
+                                                {
+                                                    "name": "relatedTableId",
+                                                    "type": "number",
+                                                    "label": "relatedTableId"
+                                                },
+                                                {
+                                                    "name": "role",
+                                                    "type": "text",
+                                                    "label": "role"
+                                                }
+                                            ],
+                                            "type": "collection"
+                                        },
+                                        "type": "array",
+                                        "label": "relationships"
+                                    },
+                                    {
+                                        "name": "type",
+                                        "type": "text",
+                                        "label": "type"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "layerInfo"
+                            },
+                            {
+                                "name": "result",
+                                "spec": [
+                                    {
+                                        "name": "globalId",
+                                        "type": "text",
+                                        "label": "globalId"
+                                    },
+                                    {
+                                        "name": "objectId",
+                                        "type": "number",
+                                        "label": "objectId"
+                                    },
+                                    {
+                                        "name": "uniqueId",
+                                        "type": "number",
+                                        "label": "uniqueId"
+                                    },
+                                    {
+                                        "name": "success",
+                                        "type": "boolean",
+                                        "label": "Success"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "result"
+                            },
+                            {
+                                "name": "attachments",
+                                "spec": [
+                                    {
+                                        "name": "images",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "id",
+                                                    "type": "number",
+                                                    "label": "id"
+                                                },
+                                                {
+                                                    "name": "globalId",
+                                                    "type": "text",
+                                                    "label": "gloablId"
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "type": "text",
+                                                    "label": "name"
+                                                },
+                                                {
+                                                    "name": "contentType",
+                                                    "type": "text",
+                                                    "label": "contentType"
+                                                },
+                                                {
+                                                    "name": "size",
+                                                    "type": "number",
+                                                    "label": "size"
+                                                },
+                                                {
+                                                    "name": "keywords",
+                                                    "type": "text",
+                                                    "label": "keywords"
+                                                },
+                                                {
+                                                    "name": "url",
+                                                    "type": "text",
+                                                    "label": "URL"
+                                                }
+                                            ],
+                                            "type": "collection"
+                                        },
+                                        "type": "array",
+                                        "label": "images"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "attachments"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "feature"
+                    },
+                    {
+                        "name": "applyEdits",
+                        "spec": {
+                            "spec": [
+                                {
+                                    "name": "id",
+                                    "type": "number",
+                                    "label": "id"
+                                },
+                                {
+                                    "name": "layerInfo",
+                                    "spec": [
+                                        {
+                                            "name": "globalIdField",
+                                            "type": "text",
+                                            "label": "globalIdField"
+                                        },
+                                        {
+                                            "name": "id",
+                                            "type": "number",
+                                            "label": "id"
+                                        },
+                                        {
+                                            "name": "name",
+                                            "type": "text",
+                                            "label": "name"
+                                        },
+                                        {
+                                            "name": "objectIdField",
+                                            "type": "text",
+                                            "label": "objectIdField"
+                                        },
+                                        {
+                                            "name": "relationships",
+                                            "spec": {
+                                                "spec": [
+                                                    {
+                                                        "name": "cardinality",
+                                                        "type": "text",
+                                                        "label": "cardinality"
+                                                    },
+                                                    {
+                                                        "name": "composite",
+                                                        "type": "boolean",
+                                                        "label": "composite"
+                                                    },
+                                                    {
+                                                        "name": "id",
+                                                        "type": "number",
+                                                        "label": "id"
+                                                    },
+                                                    {
+                                                        "name": "keyField",
+                                                        "type": "text",
+                                                        "label": "keyField"
+                                                    },
+                                                    {
+                                                        "name": "name",
+                                                        "type": "text",
+                                                        "label": "name"
+                                                    },
+                                                    {
+                                                        "name": "relatedTableId",
+                                                        "type": "number",
+                                                        "label": "relatedTableId"
+                                                    },
+                                                    {
+                                                        "name": "role",
+                                                        "type": "text",
+                                                        "label": "role"
+                                                    }
+                                                ],
+                                                "type": "collection"
+                                            },
+                                            "type": "array",
+                                            "label": "relationships"
+                                        },
+                                        {
+                                            "name": "type",
+                                            "type": "text",
+                                            "label": "type"
+                                        }
+                                    ],
+                                    "type": "collection",
+                                    "label": "layerInfo"
+                                },
+                                {
+                                    "name": "adds",
+                                    "spec": {
+                                        "spec": [
+                                            {
+                                                "name": "attributes",
+                                                "spec": [],
+                                                "type": "collection",
+                                                "label": "attributes"
+                                            },
+                                            {
+                                                "name": "geometry",
+                                                "spec": [
+                                                    {
+                                                        "name": "geometryType",
+                                                        "type": "text",
+                                                        "label": "geometryType"
+                                                    },
+                                                    {
+                                                        "name": "x",
+                                                        "type": "number",
+                                                        "label": "X"
+                                                    },
+                                                    {
+                                                        "name": "y",
+                                                        "type": "number",
+                                                        "label": "Y"
+                                                    },
+                                                    {
+                                                        "name": "spatialReference",
+                                                        "spec": [
+                                                            {
+                                                                "name": "wkid",
+                                                                "type": "number",
+                                                                "label": "wkid"
+                                                            }
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Spatial Reference"
+                                                    }
+                                                ],
+                                                "type": "collection",
+                                                "label": "geometry"
+                                            },
+                                            {
+                                                "name": "layerInfo",
+                                                "spec": [
+                                                    {
+                                                        "name": "globalIdField",
+                                                        "type": "text",
+                                                        "label": "globalIdField"
+                                                    },
+                                                    {
+                                                        "name": "id",
+                                                        "type": "number",
+                                                        "label": "id"
+                                                    },
+                                                    {
+                                                        "name": "name",
+                                                        "type": "text",
+                                                        "label": "name"
+                                                    },
+                                                    {
+                                                        "name": "objectIdField",
+                                                        "type": "text",
+                                                        "label": "objectIdField"
+                                                    },
+                                                    {
+                                                        "name": "relationships",
+                                                        "spec": {
+                                                            "spec": [
+                                                                {
+                                                                    "name": "cardinality",
+                                                                    "type": "text",
+                                                                    "label": "cardinality"
+                                                                },
+                                                                {
+                                                                    "name": "composite",
+                                                                    "type": "boolean",
+                                                                    "label": "composite"
+                                                                },
+                                                                {
+                                                                    "name": "id",
+                                                                    "type": "number",
+                                                                    "label": "id"
+                                                                },
+                                                                {
+                                                                    "name": "keyField",
+                                                                    "type": "text",
+                                                                    "label": "keyField"
+                                                                },
+                                                                {
+                                                                    "name": "name",
+                                                                    "type": "text",
+                                                                    "label": "name"
+                                                                },
+                                                                {
+                                                                    "name": "relatedTableId",
+                                                                    "type": "number",
+                                                                    "label": "relatedTableId"
+                                                                },
+                                                                {
+                                                                    "name": "role",
+                                                                    "type": "text",
+                                                                    "label": "role"
+                                                                }
+                                                            ],
+                                                            "type": "collection"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "relationships"
+                                                    },
+                                                    {
+                                                        "name": "type",
+                                                        "type": "text",
+                                                        "label": "type"
+                                                    }
+                                                ],
+                                                "type": "collection",
+                                                "label": "layerInfo"
+                                            },
+                                            {
+                                                "name": "result",
+                                                "spec": [
+                                                    {
+                                                        "name": "globalId",
+                                                        "type": "text",
+                                                        "label": "globalId"
+                                                    },
+                                                    {
+                                                        "name": "objectId",
+                                                        "type": "number",
+                                                        "label": "objectId"
+                                                    },
+                                                    {
+                                                        "name": "uniqueId",
+                                                        "type": "number",
+                                                        "label": "uniqueId"
+                                                    },
+                                                    {
+                                                        "name": "success",
+                                                        "type": "boolean",
+                                                        "label": "Success"
+                                                    }
+                                                ],
+                                                "type": "collection",
+                                                "label": "result"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    "type": "array",
+                                    "label": "adds"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "applyEdits"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 37,
+            "module": "util:ComposeTransformer",
+            "version": 1,
+            "parameters": {},
+            "filter": {
+                "name": "Password matches",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{1.feature.attributes.password_entry}}",
+                            "b": "uocc",
+                            "o": "text:equal"
+                        }
+                    ]
+                ]
+            },
+            "mapper": {
+                "value": "{{formatDate(parseDate(1.feature.attributes.datewheninspected; \"x\"); \"YYYY-MM-DD\")}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 150,
+                    "name": "Format Date"
+                },
+                "restore": {},
+                "expect": [
+                    {
+                        "name": "value",
+                        "type": "text",
+                        "label": "Text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "module": "survey123:CreateFeatureReport",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 3704854
+            },
+            "filter": {
+                "name": "Testing Filter",
+                "conditions": []
+            },
+            "mapper": {
+                "where": "",
+                "objectIds": "{{1.response[].addResults[].objectId}}",
+                "utcOffset": "-06",
+                "outputFormat": "pdf",
+                "surveyItemId": "76034c5ea1a342fc899f5a9c73c7f94a",
+                "templateItemId": "a4ae0c603c27452b8c8c4ad8c29e130e",
+                "featureLayerUrl": "https://services2.arcgis.com/NnxP4LZ3zX8wWmP9/ArcGIS/rest/services/service_6efefb3322ca4912b1b6cdfce8b7689d/FeatureServer/0",
+                "outputReportName": "{{1.feature.attributes.id_}}-{{37.value}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 150
+                },
+                "restore": {
+                    "expect": {
+                        "utcOffset": {
+                            "mode": "chose",
+                            "label": "(UTC-07:00) Mountain Time (US & Canada)"
+                        },
+                        "outputFormat": {
+                            "label": "Portable Document Format (.pdf)"
+                        },
+                        "surveyItemId": {
+                            "mode": "chose",
+                            "label": "April 30 Version"
+                        },
+                        "templateItemId": {
+                            "mode": "chose",
+                            "label": "report_template_3.docx"
+                        },
+                        "featureLayerUrl": {
+                            "label": "April_30_Version"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "survey123"
+                            },
+                            "label": "Utah Department of Environmental Quality (https://www.arcgis.com | 2025.06.05 11:23)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:survey123",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "surveyItemId",
+                        "type": "select",
+                        "label": "Survey",
+                        "required": true
+                    },
+                    {
+                        "name": "outputFormat",
+                        "type": "select",
+                        "label": "Output Format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "docx",
+                                "pdf"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "outputReportName",
+                        "type": "text",
+                        "label": "Output Report Name"
+                    },
+                    {
+                        "name": "utcOffset",
+                        "type": "select",
+                        "label": "UTC Offset"
+                    },
+                    {
+                        "name": "templateItemId",
+                        "type": "select",
+                        "label": "Report Template",
+                        "required": true
+                    },
+                    {
+                        "name": "featureLayerUrl",
+                        "type": "select",
+                        "label": "Feature Layer",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "https://services2.arcgis.com/NnxP4LZ3zX8wWmP9/ArcGIS/rest/services/service_6efefb3322ca4912b1b6cdfce8b7689d/FeatureServer/0"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "objectIds",
+                        "type": "text",
+                        "label": "Feature ObjectID"
+                    },
+                    {
+                        "name": "where",
+                        "type": "text",
+                        "label": "Feature WHERE clause"
+                    }
+                ],
+                "advanced": true
+            }
+        },
+        {
+            "id": 4,
+            "module": "http:ActionGetFile",
+            "version": 3,
+            "parameters": {
+                "handleErrors": false
+            },
+            "mapper": {
+                "url": "{{2.resultInfo.resultFiles[].url}}",
+                "method": "get",
+                "serializeUrl": false,
+                "shareCookies": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 150
+                },
+                "restore": {},
+                "parameters": [
+                    {
+                        "name": "handleErrors",
+                        "type": "boolean",
+                        "label": "Evaluate all states as errors (except for 2xx and 3xx )",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "url",
+                        "type": "url",
+                        "label": "URL",
+                        "required": true
+                    },
+                    {
+                        "name": "serializeUrl",
+                        "type": "boolean",
+                        "label": "Serialize URL",
+                        "required": true
+                    },
+                    {
+                        "name": "method",
+                        "type": "hidden",
+                        "label": "Method"
+                    },
+                    {
+                        "name": "shareCookies",
+                        "type": "boolean",
+                        "label": "Share cookies with other HTTP modules",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 21,
+            "module": "sendgrid:sendMail",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 3928535
+            },
+            "mapper": {
+                "asm": {},
+                "from": {
+                    "name": "Utah Division of Waste Management and Radiation Control",
+                    "email": "no-reply@utah.gov"
+                },
+                "send_to": [
+                    {
+                        "name": "{{1.feature.attributes.uocc_contact_name}}",
+                        "email": "{{1.feature.attributes.uocc_email_address}}"
+                    }
+                ],
+                "subject": "UOCC Inspection Report",
+                "reply_to": {},
+                "attachments": [
+                    {
+                        "content": "{{4.data}}",
+                        "filename": "{{1.feature.attributes.select_the_facility}}_{{1.feature.attributes.id_}}_{{37.value}}.pdf"
+                    }
+                ],
+                "content_type": "text/plain",
+                "content_value": "Attached is the Used Oil Collection Center inspection report for {{1.feature.attributes.select_the_facility}} ({{1.feature.attributes.id_}}) completed on {{37.value}}. {{newline}}{{newline}}Do not respond to this email. If you need assistance, please contact the Division of Waste Management and Radiation Control, Used Oil and Outreach Program at 801-536-0200. Or, visit our website at UsedOil.utah.gov",
+                "templateOrNot": "no_template"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1228,
+                    "y": 153
+                },
+                "restore": {
+                    "expect": {
+                        "asm": {
+                            "nested": {
+                                "group_id": {
+                                    "mode": "chose"
+                                },
+                                "groups_to_display": {
+                                    "mode": "chose"
+                                }
+                            }
+                        },
+                        "from": {
+                            "nested": {
+                                "email": {
+                                    "mode": "chose",
+                                    "label": "no-reply@utah.gov"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "mode": "chose"
+                        },
+                        "send_to": {
+                            "mode": "chose",
+                            "items": [
+                                null
+                            ]
+                        },
+                        "categories": {
+                            "mode": "chose"
+                        },
+                        "attachments": {
+                            "mode": "chose",
+                            "items": [
+                                null
+                            ]
+                        },
+                        "custom_args": {
+                            "mode": "chose"
+                        },
+                        "content_type": {
+                            "mode": "chose",
+                            "label": "Plaintext"
+                        },
+                        "templateOrNot": {
+                            "mode": "chose",
+                            "label": "No"
+                        },
+                        "copy_recipient": {
+                            "mode": "chose"
+                        },
+                        "blind_copy_recipient": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "sendgrid"
+                            },
+                            "label": "UOCC Sendgrid (make)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:sendgrid",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "from",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "select",
+                                "label": "Email address",
+                                "required": true
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "From"
+                    },
+                    {
+                        "name": "send_to",
+                        "spec": {
+                            "name": "value",
+                            "spec": [
+                                {
+                                    "name": "email",
+                                    "type": "email",
+                                    "label": "Email address",
+                                    "required": true
+                                },
+                                {
+                                    "name": "name",
+                                    "type": "text",
+                                    "label": "Name"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "Send to",
+                        "required": true,
+                        "validate": {
+                            "maxItems": 1000
+                        }
+                    },
+                    {
+                        "name": "templateOrNot",
+                        "type": "select",
+                        "label": "Use SendGrid Transactional template?",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "template",
+                                "no_template"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "attachments",
+                        "spec": [
+                            {
+                                "name": "filename",
+                                "type": "text",
+                                "label": "File name",
+                                "required": true,
+                                "semantic": "file:name"
+                            },
+                            {
+                                "name": "content",
+                                "type": "buffer",
+                                "label": "Data",
+                                "required": true,
+                                "semantic": "file:data"
+                            },
+                            {
+                                "name": "content_id",
+                                "type": "text",
+                                "label": "Content ID"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Attachments"
+                    },
+                    {
+                        "name": "categories",
+                        "spec": {
+                            "name": "value",
+                            "type": "text",
+                            "label": "Category",
+                            "validate": {
+                                "max": 255
+                            }
+                        },
+                        "type": "array",
+                        "label": "Categories",
+                        "validate": {
+                            "maxItems": 10
+                        }
+                    },
+                    {
+                        "name": "send_at",
+                        "type": "date",
+                        "label": "Send at"
+                    },
+                    {
+                        "name": "copy_recipient",
+                        "spec": {
+                            "name": "value",
+                            "spec": [
+                                {
+                                    "name": "email",
+                                    "type": "email",
+                                    "label": "Email"
+                                },
+                                {
+                                    "name": "name",
+                                    "type": "text",
+                                    "label": "Name"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "Copy recipient",
+                        "validate": {
+                            "maxItems": 999
+                        }
+                    },
+                    {
+                        "name": "blind_copy_recipient",
+                        "spec": {
+                            "name": "value",
+                            "spec": [
+                                {
+                                    "name": "email",
+                                    "type": "email",
+                                    "label": "Email"
+                                },
+                                {
+                                    "name": "name",
+                                    "type": "text",
+                                    "label": "Name"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "Blind copy recipient",
+                        "validate": {
+                            "maxItems": 999
+                        }
+                    },
+                    {
+                        "name": "reply_to",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "email",
+                                "label": "Email address"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Reply to"
+                    },
+                    {
+                        "name": "asm",
+                        "spec": [
+                            {
+                                "name": "group_id",
+                                "type": "select",
+                                "label": "Group ID"
+                            },
+                            {
+                                "name": "groups_to_display",
+                                "type": "select",
+                                "label": "Groups to Display",
+                                "multiple": true
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "ASM"
+                    },
+                    {
+                        "name": "custom_args",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key"
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Custom Args"
+                    },
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key",
+                                "required": true
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Headers"
+                    },
+                    {
+                        "name": "subject",
+                        "type": "text",
+                        "label": "Subject",
+                        "required": true
+                    },
+                    {
+                        "name": "content_type",
+                        "type": "select",
+                        "label": "Content Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "text/plain",
+                                "text/html"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "content_value",
+                        "type": "text",
+                        "label": "Content",
+                        "required": true
+                    }
+                ],
+                "advanced": true
+            },
+            "onerror": [
+                {
+                    "id": 42,
+                    "module": "builtin:Resume",
+                    "version": 1,
+                    "parameters": {},
+                    "mapper": {
+                        "XmessageId": "{{21.error.message}}"
+                    },
+                    "metadata": {
+                        "designer": {
+                            "x": 1500,
+                            "y": 300
+                        },
+                        "restore": {},
+                        "expect": [
+                            {
+                                "name": "XmessageId",
+                                "type": "text",
+                                "label": "X Message ID"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": 17,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 1500,
+                    "y": 0
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 35,
+                            "module": "util:Switcher",
+                            "version": 1,
+                            "parameters": {},
+                            "mapper": {
+                                "input": "{{1.feature.attributes.lhd}}",
+                                "casesTable": [
+                                    {
+                                        "output": "1lbtiN9ZPPBQxcfvY5_I7EOArbgxydI-x",
+                                        "pattern": "BRHD"
+                                    },
+                                    {
+                                        "output": "1okhf-juo5-aCvTznj4f9v6tSiLpo8MX_",
+                                        "pattern": "CUHD"
+                                    },
+                                    {
+                                        "output": "1snj1w1O6ECnbjfJBA5HXogyCzFynxt3Z",
+                                        "pattern": "DCHD"
+                                    },
+                                    {
+                                        "output": "1l_n7XS_uT1ZjCkKdrgEPhAOUnL8-NEu7",
+                                        "pattern": "SLCoHD"
+                                    },
+                                    {
+                                        "output": "1067v4CpPdPMbEB8wVFvIoO-1Lg6yR4jG",
+                                        "pattern": "SJHD"
+                                    },
+                                    {
+                                        "output": "12h9Joi69J1lfkjEXMUvpzKDxoIsNhyZj",
+                                        "pattern": "SEUHD"
+                                    },
+                                    {
+                                        "output": "1Pjj9cW6Jtw-FQHgkamMhOKkG0dMm0sCM",
+                                        "pattern": "SWUHD"
+                                    },
+                                    {
+                                        "output": "1jxmYKbh7exlfjb1j6EN-Ey58es5zLKZo",
+                                        "pattern": "SCHD"
+                                    },
+                                    {
+                                        "output": "19tB2YB1AflL_vKrvM4B8biusuLrTLEf0",
+                                        "pattern": "TCoHD"
+                                    },
+                                    {
+                                        "output": "1WXdp692dBzvPZ8ZYL6VFSrIruFvWf9KM",
+                                        "pattern": "TCHD"
+                                    },
+                                    {
+                                        "output": "13EF9lwWpHBxkG9gcgvgSfDqB2qvNFnzl",
+                                        "pattern": "UCHD"
+                                    },
+                                    {
+                                        "output": "1nSNNW6fzfPhqt-A2DPzVMiNuFfZ6CSZl",
+                                        "pattern": "WCHD"
+                                    },
+                                    {
+                                        "output": "15G3T9mTglHjFzkjo8cNO8Qvl3Z8Flp_f",
+                                        "pattern": "WMHD"
+                                    }
+                                ],
+                                "elseOutput": "",
+                                "useRegExpMatch": false
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1800,
+                                    "y": 0
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "casesTable": {
+                                            "mode": "chose",
+                                            "items": [
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                null
+                                            ]
+                                        }
+                                    }
+                                },
+                                "expect": [
+                                    {
+                                        "name": "input",
+                                        "type": "text",
+                                        "label": "Input"
+                                    },
+                                    {
+                                        "name": "useRegExpMatch",
+                                        "type": "boolean",
+                                        "label": "Use regular expressions to match",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "casesTable",
+                                        "spec": [
+                                            {
+                                                "name": "pattern",
+                                                "type": "text",
+                                                "label": "Pattern"
+                                            },
+                                            {
+                                                "name": "output",
+                                                "type": "any",
+                                                "label": "Output"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Cases",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "elseOutput",
+                                        "type": "any",
+                                        "label": "Else"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 36,
+                            "module": "google-drive:uploadAFile",
+                            "version": 4,
+                            "parameters": {
+                                "__IMTCONN__": 3934489
+                            },
+                            "mapper": {
+                                "data": "{{4.data}}",
+                                "select": "map",
+                                "convert": false,
+                                "filename": "{{1.feature.attributes.select_the_facility}}_{{1.feature.attributes.id_}}_{{37.value}}.pdf",
+                                "folderId": "{{35.output}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 2100,
+                                    "y": 0
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "select": {
+                                            "label": "Enter manually"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "google-restricted"
+                                            },
+                                            "label": "GCP OAuth"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:google-restricted",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "type": "hidden"
+                                    },
+                                    {
+                                        "name": "select",
+                                        "type": "select",
+                                        "label": "Enter a Folder ID",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "map",
+                                                "value"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "title",
+                                        "type": "text",
+                                        "label": "New File Name"
+                                    },
+                                    {
+                                        "name": "filename",
+                                        "type": "text",
+                                        "label": "File Name",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "data",
+                                        "type": "buffer",
+                                        "label": "Data",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "convert",
+                                        "type": "boolean",
+                                        "label": "Convert a File",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "folderId",
+                                        "type": "text",
+                                        "label": "Folder ID",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 22,
+                            "module": "sendgrid:sendMail",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 3928535
+                            },
+                            "filter": {
+                                "name": "Requests Assistance",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{1.feature.attributes.assistance}}",
+                                            "b": "yes",
+                                            "o": "text:equal"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "asm": {},
+                                "from": {
+                                    "name": "UOCC Inspections",
+                                    "email": "no-reply@utah.gov"
+                                },
+                                "send_to": [
+                                    {
+                                        "name": "DWMRC",
+                                        "email": "DWMRCsubmit@utah.gov"
+                                    }
+                                ],
+                                "subject": "UOCC Inspection: Request for Assistance",
+                                "reply_to": {},
+                                "attachments": [
+                                    {
+                                        "content": "{{4.data}}",
+                                        "filename": "{{1.feature.attributes.select_the_facility}}_{{1.feature.attributes.id_}}_{{37.value}}.pdf"
+                                    }
+                                ],
+                                "content_type": "text/html",
+                                "content_value": "{{1.feature.attributes.inspectorname}} ({{1.feature.attributes.employee_email}}) at {{1.feature.attributes.lhd}}  requested assistance during the inspection of {{1.feature.attributes.select_the_facility}} ({{1.feature.attributes.id_}}) on {{37.value}}. Their report is attached.",
+                                "templateOrNot": "no_template",
+                                "copy_recipient": [
+                                    {
+                                        "name": "{{1.feature.attributes.inspectorname}}",
+                                        "email": "{{1.feature.attributes.employee_email}}"
+                                    }
+                                ]
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1800,
+                                    "y": 300
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "asm": {
+                                            "nested": {
+                                                "group_id": {
+                                                    "mode": "chose"
+                                                },
+                                                "groups_to_display": {
+                                                    "mode": "chose"
+                                                }
+                                            },
+                                            "collapsed": true
+                                        },
+                                        "from": {
+                                            "nested": {
+                                                "email": {
+                                                    "mode": "chose",
+                                                    "label": "no-reply@utah.gov"
+                                                }
+                                            }
+                                        },
+                                        "headers": {
+                                            "mode": "chose"
+                                        },
+                                        "send_to": {
+                                            "mode": "chose",
+                                            "items": [
+                                                null
+                                            ]
+                                        },
+                                        "categories": {
+                                            "mode": "chose"
+                                        },
+                                        "attachments": {
+                                            "mode": "chose",
+                                            "items": [
+                                                null
+                                            ]
+                                        },
+                                        "custom_args": {
+                                            "mode": "chose"
+                                        },
+                                        "content_type": {
+                                            "mode": "chose",
+                                            "label": "HTML"
+                                        },
+                                        "templateOrNot": {
+                                            "mode": "chose",
+                                            "label": "No"
+                                        },
+                                        "copy_recipient": {
+                                            "mode": "chose",
+                                            "items": [
+                                                null
+                                            ]
+                                        },
+                                        "blind_copy_recipient": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "sendgrid"
+                                            },
+                                            "label": "UOCC Sendgrid (make)"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:sendgrid",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "from",
+                                        "spec": [
+                                            {
+                                                "name": "email",
+                                                "type": "select",
+                                                "label": "Email address",
+                                                "required": true
+                                            },
+                                            {
+                                                "name": "name",
+                                                "type": "text",
+                                                "label": "Name"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "From"
+                                    },
+                                    {
+                                        "name": "send_to",
+                                        "spec": {
+                                            "name": "value",
+                                            "spec": [
+                                                {
+                                                    "name": "email",
+                                                    "type": "email",
+                                                    "label": "Email address",
+                                                    "required": true
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "type": "text",
+                                                    "label": "Name"
+                                                }
+                                            ],
+                                            "type": "collection"
+                                        },
+                                        "type": "array",
+                                        "label": "Send to",
+                                        "required": true,
+                                        "validate": {
+                                            "maxItems": 1000
+                                        }
+                                    },
+                                    {
+                                        "name": "templateOrNot",
+                                        "type": "select",
+                                        "label": "Use SendGrid Transactional template?",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "template",
+                                                "no_template"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "attachments",
+                                        "spec": [
+                                            {
+                                                "name": "filename",
+                                                "type": "text",
+                                                "label": "File name",
+                                                "required": true,
+                                                "semantic": "file:name"
+                                            },
+                                            {
+                                                "name": "content",
+                                                "type": "buffer",
+                                                "label": "Data",
+                                                "required": true,
+                                                "semantic": "file:data"
+                                            },
+                                            {
+                                                "name": "content_id",
+                                                "type": "text",
+                                                "label": "Content ID"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Attachments"
+                                    },
+                                    {
+                                        "name": "categories",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "text",
+                                            "label": "Category",
+                                            "validate": {
+                                                "max": 255
+                                            }
+                                        },
+                                        "type": "array",
+                                        "label": "Categories",
+                                        "validate": {
+                                            "maxItems": 10
+                                        }
+                                    },
+                                    {
+                                        "name": "send_at",
+                                        "type": "date",
+                                        "label": "Send at"
+                                    },
+                                    {
+                                        "name": "copy_recipient",
+                                        "spec": {
+                                            "name": "value",
+                                            "spec": [
+                                                {
+                                                    "name": "email",
+                                                    "type": "email",
+                                                    "label": "Email"
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "type": "text",
+                                                    "label": "Name"
+                                                }
+                                            ],
+                                            "type": "collection"
+                                        },
+                                        "type": "array",
+                                        "label": "Copy recipient",
+                                        "validate": {
+                                            "maxItems": 999
+                                        }
+                                    },
+                                    {
+                                        "name": "blind_copy_recipient",
+                                        "spec": {
+                                            "name": "value",
+                                            "spec": [
+                                                {
+                                                    "name": "email",
+                                                    "type": "email",
+                                                    "label": "Email"
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "type": "text",
+                                                    "label": "Name"
+                                                }
+                                            ],
+                                            "type": "collection"
+                                        },
+                                        "type": "array",
+                                        "label": "Blind copy recipient",
+                                        "validate": {
+                                            "maxItems": 999
+                                        }
+                                    },
+                                    {
+                                        "name": "reply_to",
+                                        "spec": [
+                                            {
+                                                "name": "email",
+                                                "type": "email",
+                                                "label": "Email address"
+                                            },
+                                            {
+                                                "name": "name",
+                                                "type": "text",
+                                                "label": "Name"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Reply to"
+                                    },
+                                    {
+                                        "name": "asm",
+                                        "spec": [
+                                            {
+                                                "name": "group_id",
+                                                "type": "select",
+                                                "label": "Group ID"
+                                            },
+                                            {
+                                                "name": "groups_to_display",
+                                                "type": "select",
+                                                "label": "Groups to Display",
+                                                "multiple": true
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "ASM"
+                                    },
+                                    {
+                                        "name": "custom_args",
+                                        "spec": [
+                                            {
+                                                "name": "key",
+                                                "type": "text",
+                                                "label": "Key"
+                                            },
+                                            {
+                                                "name": "value",
+                                                "type": "text",
+                                                "label": "Value"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Custom Args"
+                                    },
+                                    {
+                                        "name": "headers",
+                                        "spec": [
+                                            {
+                                                "name": "key",
+                                                "type": "text",
+                                                "label": "Key",
+                                                "required": true
+                                            },
+                                            {
+                                                "name": "value",
+                                                "type": "text",
+                                                "label": "Value"
+                                            }
+                                        ],
+                                        "type": "array",
+                                        "label": "Headers"
+                                    },
+                                    {
+                                        "name": "subject",
+                                        "type": "text",
+                                        "label": "Subject",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "content_type",
+                                        "type": "select",
+                                        "label": "Content Type",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "text/plain",
+                                                "text/html"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "content_value",
+                                        "type": "text",
+                                        "label": "Content",
+                                        "required": true
+                                    }
+                                ],
+                                "advanced": true
+                            },
+                            "onerror": [
+                                {
+                                    "id": 43,
+                                    "module": "builtin:Resume",
+                                    "version": 1,
+                                    "parameters": {},
+                                    "mapper": {
+                                        "XmessageId": "{{22.error.message}}"
+                                    },
+                                    "metadata": {
+                                        "designer": {
+                                            "x": 2100,
+                                            "y": 300
+                                        },
+                                        "restore": {},
+                                        "expect": [
+                                            {
+                                                "name": "XmessageId",
+                                                "type": "text",
+                                                "label": "X Message ID"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": []
+    }
+}
