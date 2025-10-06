@@ -6,7 +6,6 @@ Run the uocc-skid as a Cloud Run instance. Uses the entry point defined in setup
 
 import json
 import logging
-import os
 import re
 import shutil
 import sys
@@ -313,7 +312,8 @@ class Skid:
         contacts_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/uocc_contacts.csv", index=False)
 
         #: Remove old zip file to avoid conflicts
-        os.remove(downloaded_zip)
+        Path(downloaded_zip).unlink()
+        
 
         #: Re-zip the survey form with the new data, update the AGOL item
         new_zip_name = survey_properties["title"]
