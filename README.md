@@ -1,6 +1,7 @@
 # UOCC Skid
 
 [![Push Events](https://github.com/agrc/uocc-skid/actions/workflows/push.yml/badge.svg)](https://github.com/agrc/uocc-skid/actions/workflows/push.yml)
+[![Release Events](https://github.com/agrc/uocc-skid/actions/workflows/release.yml/badge.svg)](https://github.com/agrc/uocc-skid/actions/workflows/release.yml)
 
 Moves data around to support a Survey123 form to replace DEQ's Used Oil Collection Center (UOCC) PDF forms.
 
