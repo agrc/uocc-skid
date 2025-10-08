@@ -107,7 +107,7 @@ class Skid:
         logging.captureWarnings(True)
 
         skid_logger.debug("Creating Supervisor object")
-        self.supervisor = Supervisor(handle_errors=False)
+        self.supervisor = Supervisor(handle_errors=True, logger=skid_logger, log_path=self.log_path)
         sendgrid_settings = config.SENDGRID_SETTINGS
         sendgrid_settings["api_key"] = self.secrets.SENDGRID_API_KEY
         self.supervisor.add_message_handler(
@@ -165,6 +165,7 @@ class Skid:
             lhd_load_counts.append(f"{lhd_abbreviation}: {load_count}")
 
         updated_contacts_df, contact_update_status = self.update_contacts_from_responses(responses)
+        self.skid_logger.info(contact_update_status)
 
         locations_df = self._extract_locations_from_sheet()
         locations_df = self._add_lhd_by_county(locations_df)
@@ -179,6 +180,7 @@ class Skid:
         contacts_without_ids = contacts_df[contacts_df["ID"].isna()]
 
         update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
+        self.skid_logger.info("Survey media folder update success: %s", update_success)
 
         end = datetime.now()
 
