@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 from uocc import main
 
@@ -10,18 +11,26 @@ def test_get_secrets_from_gcp_location(mocker):
 
     secrets = main.Skid._get_secrets()
 
-    assert secrets == {"foo": "bar", "SERVICE_ACCOUNT_JSON": "sa"}
+    assert secrets == {"foo": "bar", "GOOGLE_CREDENTIALS": "sa"}
 
 
 def test_get_secrets_from_local_location(mocker):
-    exists_mock = mocker.Mock(side_effect=[False, True])
-    mocker.patch("pathlib.Path.exists", new=exists_mock)
+    mocker.patch("pathlib.Path.exists", return_value=False)
     mocker.patch("pathlib.Path.read_text", return_value='{"foo":"bar"}')
+    mocker.patch("google.auth.default", return_value=("local_adc", 42))
 
     secrets = main.Skid._get_secrets()
 
-    assert secrets == {"foo": "bar"}
-    assert exists_mock.call_count == 2
+    assert secrets == {"foo": "bar", "GOOGLE_CREDENTIALS": "local_adc"}
+
+
+def test_get_secrets_raises_if_no_secrets(mocker):
+    mocker.patch("pathlib.Path.exists", return_value=False)
+    mocker.patch("pathlib.Path.read_text", side_effect=FileNotFoundError)
+
+    with pytest.raises(RuntimeError) as excinfo:
+        main.Skid._get_secrets()
+        assert "Secrets folder not found; secrets not loaded." in str(excinfo.value)
 
 
 class TestLocationsExtracting:
