@@ -498,7 +498,9 @@ class Skid:
             "Loading updated contacts to the contacts sheet with id %s", self.secrets.UOCC_CONTACTS_SHEET_ID
         )
         gsheets_client = utils.authorize_pygsheets(self.secrets.GOOGLE_CREDENTIALS)
-        contacts_worksheet = gsheets_client.open_by_key(self.secrets.UOCC_CONTACTS_SHEET_ID).worksheet("index", 0)
+        contacts_worksheet = gsheets_client.open_by_key(self.secrets.UOCC_CONTACTS_SHEET_ID).worksheet(
+            "title", "UOCC Contacts"
+        )
         contacts_worksheet.set_dataframe(
             updated_contacts,
             (1, 1),
