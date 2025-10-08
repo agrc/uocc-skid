@@ -49,27 +49,29 @@ class Skid:
         """A helper method for loading secrets from either a GCF mount point or the local src/skid/secrets/secrets.json file
 
         Raises:
-            FileNotFoundError: If the secrets file can't be found.
+            RuntimeError: If the secrets file can't be found.
 
         Returns:
             dict: The secrets .json loaded as a dictionary
         """
 
-        secret_folder = Path("/secrets")
-
         #: Try to get the secrets from the Cloud Function mount point
+        secret_folder = Path("/secrets")
         if secret_folder.exists():
             secrets_dict = json.loads(Path("/secrets/app/secrets.json").read_text(encoding="utf-8"))
-            credentials, _ = google.auth.default()
-            secrets_dict["SERVICE_ACCOUNT_JSON"] = credentials
-            return secrets_dict
 
         #: Otherwise, try to load a local copy for local development
-        secret_folder = Path(__file__).parent / "secrets"
-        if secret_folder.exists():
-            return json.loads((secret_folder / "secrets.json").read_text(encoding="utf-8"))
+        else:
+            secret_folder = Path(__file__).parent / "secrets"
+            try:
+                secrets_dict = json.loads((secret_folder / "secrets.json").read_text(encoding="utf-8"))
+            except Exception as e:
+                raise RuntimeError("Secrets folder not found; secrets not loaded.") from e
 
-        raise FileNotFoundError("Secrets folder not found; secrets not loaded.")
+        #: Authenticate with Google via ADC
+        credentials, _ = google.auth.default()
+        secrets_dict["GOOGLE_CREDENTIALS"] = credentials
+        return secrets_dict
 
     def _initialize_supervisor(self):
         """A helper method to set up logging and supervisor
@@ -216,7 +218,7 @@ class Skid:
         self._remove_log_file_handlers(loggers)
 
     def _extract_locations_from_sheet(self):
-        gsheet_extractor = extract.GSheetLoader(self.secrets.SERVICE_ACCOUNT_JSON)
+        gsheet_extractor = extract.GSheetLoader(self.secrets.GOOGLE_CREDENTIALS)
         uocc_df = gsheet_extractor.load_specific_worksheet_into_dataframe(
             self.secrets.UOCC_LOCATIONS_SHEET_ID, "UOCCs", by_title=True
         )
@@ -286,7 +288,7 @@ class Skid:
         return df
 
     def _extract_contacts_from_sheet(self):
-        gsheet_extractor = extract.GSheetLoader(self.secrets.SERVICE_ACCOUNT_JSON)
+        gsheet_extractor = extract.GSheetLoader(self.secrets.GOOGLE_CREDENTIALS)
         contacts_df = gsheet_extractor.load_specific_worksheet_into_dataframe(
             self.secrets.UOCC_CONTACTS_SHEET_ID, "UOCC Contacts", by_title=True
         )
@@ -313,7 +315,6 @@ class Skid:
 
         #: Remove old zip file to avoid conflicts
         Path(downloaded_zip).unlink()
-        
 
         #: Re-zip the survey form with the new data, update the AGOL item
         new_zip_name = survey_properties["title"]
@@ -380,7 +381,7 @@ class Skid:
         self.skid_logger.debug(
             "Loading responses to the %s sheet with id %s", lhd_abbreviation, self.lhd_sheet_ids[lhd_abbreviation]
         )
-        gsheets_client = utils.authorize_pygsheets(self.secrets.SERVICE_ACCOUNT_JSON)
+        gsheets_client = utils.authorize_pygsheets(self.secrets.GOOGLE_CREDENTIALS)
         lhd_worksheet = gsheets_client.open_by_key(self.lhd_sheet_ids[lhd_abbreviation]).worksheet("index", 0)
         live_dataframe = lhd_worksheet.get_as_df()
         lhd_dataframe = responses[responses["Local Health District:"] == lhd_abbreviation].copy()
@@ -496,7 +497,7 @@ class Skid:
         self.skid_logger.debug(
             "Loading updated contacts to the contacts sheet with id %s", self.secrets.UOCC_CONTACTS_SHEET_ID
         )
-        gsheets_client = utils.authorize_pygsheets(self.secrets.SERVICE_ACCOUNT_JSON)
+        gsheets_client = utils.authorize_pygsheets(self.secrets.GOOGLE_CREDENTIALS)
         contacts_worksheet = gsheets_client.open_by_key(self.secrets.UOCC_CONTACTS_SHEET_ID).worksheet("index", 0)
         contacts_worksheet.set_dataframe(
             updated_contacts,
