@@ -21,14 +21,16 @@ The second pipeline extracts any contacts from the responses where the inspector
 
 DEQ maintains two sheets/tabs of information that are used to update the CSVs holding the UOCC location data and contact information. These are stored in the survey's media folder, and the skid [updates them](https://developers.arcgis.com/survey123/guide/update-contents-of-the-media-folder-for-an-arcgis-survey123-form-item/) using the ArcGIS API for Python. The locations are pulled straight from the sheet, while the contacts are pulled from the data used to update the contacts sheet.
 
-
 ## Schedule
 
 The skid is scheduled to run every Monday at 3:00 AM
 
 ## Make.com Automation
 
-The UOCC project also uses a make.com automation scenario that is triggered via webhook whenever an inspection is completed through Survey123. This automation generates a PDF report from the inspection results, emails it to the UOCC's contact, and saves it to a Google Drive folder for each LHD.
+The UOCC project also uses a make.com automation scenario that is triggered via webhook whenever an inspection is completed through Survey123. This automation generates a PDF report from the inspection results, emails it to the UOCC's contact, and saves it to a Google Drive folder for each LHD. The credentials for the Make.com account are stored in our password manager.
 
 The scenario also monitors the "Request DWMRC assistance" question, and if the response is Yes it will send an email to DWMRC (with the inspector cc'd) containing the report.
 
+The "blueprint" JSON for the automation is stored in the `src/make_automation` directory. It requires making three Connections in Make: a Survey123 connection, a Sendgrid connection, and a Google Drive connection. To recreate the automation, you will need to modify the scenario to use the new connections. It may be easiest to use the old flow as a example to copy/rebuild from rather than try to insert and update it directly. The Survey123 connection uses the credentials for DEQ's AGOL org, Sendgrid uses our account, and Google Drive uses a custom OAuth client in the GCP project.
+
+As far as we know, the GCP OAuth client cannot be created through Terraform and must be created manually. Make.com's [documentation](https://apps.make.com/google-drive#KA5rq) includes the necessary settings for the client. Once you've created it, copy the Client ID and Client Secret. You'll paste these into the Make.com connection to handle authentication.
