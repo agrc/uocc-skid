@@ -28,5 +28,5 @@ SENDGRID_SETTINGS = {  #: Settings for SendGridHandler
     ],
     "prefix": f"{SKID_NAME} on {HOST_NAME}: ",
 }
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
 LOG_FILE_NAME = "log"
