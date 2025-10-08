@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/agrc/uocc-skid/compare/v1.0.0...v1.0.1) (2025-10-08)
+
+
+### Bug Fixes
+
+* handle exceptions with supervisor, logging ([371671f](https://github.com/agrc/uocc-skid/commit/371671f601fe85dac818d5f00a0c8f76daff8dff))
+
 ## 1.0.0 (2025-10-08)
 
 
