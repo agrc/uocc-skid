@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/agrc/uocc-skid/compare/v1.0.1...v1.0.2) (2026-01-28)
+
+
+### Dependencies
+
+* **dev:** update pytest requirement from &lt;9,&gt;=7 to &gt;=7,&lt;10 ([5f5574e](https://github.com/agrc/uocc-skid/commit/5f5574e00fece041a779fda664666025b537b717))
+
 ## [1.0.1](https://github.com/agrc/uocc-skid/compare/v1.0.0...v1.0.1) (2025-10-08)
 
 
