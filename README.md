@@ -34,3 +34,7 @@ The scenario also monitors the "Request DWMRC assistance" question, and if the r
 The "blueprint" JSON for the automation is stored in the `src/make_automation` directory. It requires making three Connections in Make: a Survey123 connection, a Sendgrid connection, and a Google Drive connection. To recreate the automation, you will need to modify the scenario to use the new connections. It may be easiest to use the old flow as a example to copy/rebuild from rather than try to insert and update it directly. The Survey123 connection uses the credentials for DEQ's AGOL org, Sendgrid uses our account, and Google Drive uses a custom OAuth client in the GCP project.
 
 As far as we know, the GCP OAuth client cannot be created through Terraform and must be created manually. Make.com's [documentation](https://apps.make.com/google-drive#KA5rq) includes the necessary settings for the client. Once you've created it, copy the Client ID and Client Secret. You'll paste these into the Make.com connection to handle authentication.
+
+## Attribution
+
+This project was developed with the assistance of [GitHub Copilot](https://github.com/features/copilot).
