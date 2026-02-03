@@ -3,6 +3,18 @@
 ## General Guidelines
 
 - Prefer to return early from functions to reduce nesting and improve code readability.
+- Always follow good security practices
+- Use f-strings for string formatting
+- Use logging instead of print statements
+- Follow the DRY principle (Don't Repeat Yourself)
+- Use pathlib for all file operations
+- Follow defensive programming practices
+  - Validate all function inputs
+  - Handle exceptions gracefully
+- Use retry logic for any network calls
+- Add a new line before return statements in functions
+- Use list/dict/set comprehensions where appropriate
+- Avoid using wildcard imports (e.g., from module import *)
 
 ## Commit Message Format
 
@@ -17,6 +29,7 @@ For detailed guidelines on commit types, scopes, and formatting rules, see the <
 - Indentation: 4 spaces for Python files
 - Use type hints for all new work
 - Follow PEP 8 conventions
+- Follow ruff style guide and linting rules
 - Use pylint disable comments sparingly and only when necessary (e.g., `# pylint: disable=invalid-name`)
 
 ### Documentation
@@ -30,6 +43,7 @@ For detailed guidelines on commit types, scopes, and formatting rules, see the <
 
 ## Testing Guidelines
 
+- Unit tests are required, and are required to pass before PR
 - Mock external services
 - Test both success and failure paths
 - Verify warning messages for invalid configurations
