@@ -591,3 +591,57 @@ class TestLoadResponsesToSheet:
         # No new data to add
         assert result == 0
 
+    def test_load_responses_to_sheet_handles_all_empty_worksheets_without_keyerror(self, mocker):
+        """Test that when all worksheets are empty, an empty DataFrame with GlobalID column is created
+        and no KeyError is raised when checking for new records"""
+        # Setup mock worksheets that are all empty
+        worksheet1_data = pd.DataFrame()  # Empty worksheet
+        worksheet2_data = pd.DataFrame()  # Empty worksheet
+        
+        mock_worksheet1 = mocker.Mock()
+        mock_worksheet1.get_as_df.return_value = worksheet1_data
+        mock_worksheet1.title = "Worksheet1"
+        
+        mock_worksheet2 = mocker.Mock()
+        mock_worksheet2.get_as_df.return_value = worksheet2_data
+        mock_worksheet2.title = "Worksheet2"
+        
+        mock_spreadsheet = mocker.Mock()
+        mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
+        mock_spreadsheet.worksheet.return_value = mock_worksheet1
+        
+        mock_gsheets_client = mocker.Mock()
+        mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
+        
+        mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
+        
+        skid_instance = mocker.Mock()
+        skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
+        skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
+        
+        # Create responses with new data
+        responses = pd.DataFrame(
+            {
+                "GlobalID": ["id1", "id2", "id3"],
+                "Local Health District:": ["LHD1", "LHD1", "LHD1"],
+                "Data": ["data1", "data2", "data3"],
+            }
+        )
+        
+        # Call the method - this should not raise a KeyError
+        result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
+        
+        # Should have read both worksheets
+        assert mock_worksheet1.get_as_df.call_count == 1
+        assert mock_worksheet2.get_as_df.call_count == 1
+        
+        # All responses should be added since live_dataframe is empty
+        assert result == 3
+        
+        # Verify set_dataframe was called with all the new data
+        mock_worksheet1.set_dataframe.assert_called_once()
+        call_args = mock_worksheet1.set_dataframe.call_args
+        added_df = call_args[0][0]
+        assert len(added_df) == 3
+        assert set(added_df["GlobalID"].tolist()) == {"id1", "id2", "id3"}
+
