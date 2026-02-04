@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.3](https://github.com/agrc/uocc-skid/compare/v1.0.2...v1.0.3) (2026-02-04)
+
+
+### Features
+
+* add GitHub Copilot instructions file ([2bed202](https://github.com/agrc/uocc-skid/commit/2bed202c5c79753ee79c427dd43598fce4fc785e))
+
+
+### Dependencies
+
+* update ugrc-palletjack requirement from &lt;5.3,&gt;=5.0 to &gt;=5.0,&lt;6.1 ([634dca9](https://github.com/agrc/uocc-skid/commit/634dca9847a866e2a7788febb1c4f2e014cbd39b))
+
 ## [1.0.2](https://github.com/agrc/uocc-skid/compare/v1.0.1...v1.0.2) (2026-01-28)
 
 
