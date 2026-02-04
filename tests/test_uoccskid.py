@@ -492,9 +492,11 @@ class TestLoadResponsesToSheet:
         # Mock worksheet objects
         mock_worksheet1 = mocker.Mock()
         mock_worksheet1.get_as_df.return_value = worksheet1_data
+        mock_worksheet1.title = "Worksheet1"
         
         mock_worksheet2 = mocker.Mock()
         mock_worksheet2.get_as_df.return_value = worksheet2_data
+        mock_worksheet2.title = "Worksheet2"
         
         # Mock spreadsheet to return both worksheets
         mock_spreadsheet = mocker.Mock()
@@ -554,9 +556,11 @@ class TestLoadResponsesToSheet:
         
         mock_worksheet1 = mocker.Mock()
         mock_worksheet1.get_as_df.return_value = worksheet1_data
+        mock_worksheet1.title = "Worksheet1"
         
         mock_worksheet2 = mocker.Mock()
         mock_worksheet2.get_as_df.return_value = worksheet2_data
+        mock_worksheet2.title = "Worksheet2"
         
         mock_spreadsheet = mocker.Mock()
         mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
@@ -586,4 +590,65 @@ class TestLoadResponsesToSheet:
         
         # No new data to add
         assert result == 0
+
+    def test_load_responses_to_sheet_removes_duplicate_globalids(self, mocker):
+        """Test that duplicate GlobalIDs across worksheets are removed, keeping the last occurrence"""
+        # Setup worksheets with duplicate GlobalIDs
+        worksheet1_data = pd.DataFrame(
+            {
+                "GlobalID": ["id1", "id2", "id3"],
+                "Local Health District:": ["LHD1", "LHD1", "LHD1"],
+                "Data": ["data1_v1", "data2_v1", "data3"],
+            }
+        )
+        worksheet2_data = pd.DataFrame(
+            {
+                "GlobalID": ["id1", "id2", "id4"],
+                "Local Health District:": ["LHD1", "LHD1", "LHD1"],
+                "Data": ["data1_v2", "data2_v2", "data4"],
+            }
+        )
+        
+        mock_worksheet1 = mocker.Mock()
+        mock_worksheet1.get_as_df.return_value = worksheet1_data
+        mock_worksheet1.title = "Worksheet1"
+        
+        mock_worksheet2 = mocker.Mock()
+        mock_worksheet2.get_as_df.return_value = worksheet2_data
+        mock_worksheet2.title = "Worksheet2"
+        
+        mock_spreadsheet = mocker.Mock()
+        mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
+        mock_spreadsheet.worksheet.return_value = mock_worksheet1
+        
+        mock_gsheets_client = mocker.Mock()
+        mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
+        
+        mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
+        
+        skid_instance = mocker.Mock()
+        skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
+        skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
+        
+        # Create responses with a truly new ID
+        responses = pd.DataFrame(
+            {
+                "GlobalID": ["id1", "id2", "id3", "id4", "id5"],
+                "Local Health District:": ["LHD1", "LHD1", "LHD1", "LHD1", "LHD1"],
+                "Data": ["data1_v2", "data2_v2", "data3", "data4", "data5_new"],
+            }
+        )
+        
+        result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
+        
+        # Only id5 should be added (id1, id2 exist in both worksheets but after deduplication,
+        # id3 exists in worksheet1, id4 exists in worksheet2)
+        assert result == 1
+        
+        # Verify set_dataframe was called with only the new ID
+        mock_worksheet1.set_dataframe.assert_called_once()
+        call_args = mock_worksheet1.set_dataframe.call_args
+        added_df = call_args[0][0]
+        assert len(added_df) == 1
+        assert added_df["GlobalID"].iloc[0] == "id5"
 
