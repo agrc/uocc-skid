@@ -384,12 +384,27 @@ class Skid:
             "Loading responses to the %s sheet with id %s", lhd_abbreviation, self.lhd_sheet_ids[lhd_abbreviation]
         )
         gsheets_client = utils.authorize_pygsheets(self.secrets.GOOGLE_CREDENTIALS)
-        lhd_worksheet = gsheets_client.open_by_key(self.lhd_sheet_ids[lhd_abbreviation]).worksheet("index", 0)
-        live_dataframe = lhd_worksheet.get_as_df()
+        lhd_spreadsheet = gsheets_client.open_by_key(self.lhd_sheet_ids[lhd_abbreviation])
+        
+        # Iterate through all worksheets and combine their data
+        all_worksheets = lhd_spreadsheet.worksheets()
+        dataframes = []
+        for worksheet in all_worksheets:
+            df = worksheet.get_as_df()
+            if not df.empty:
+                dataframes.append(df)
+        
+        # Combine all DataFrames into one
+        if dataframes:
+            live_dataframe = pd.concat(dataframes, ignore_index=True)
+        else:
+            live_dataframe = pd.DataFrame()
         lhd_dataframe = responses[responses["Local Health District:"] == lhd_abbreviation].copy()
         adds = lhd_dataframe[~lhd_dataframe["GlobalID"].isin(live_dataframe["GlobalID"])]
         if not adds.empty:
-            lhd_worksheet.set_dataframe(
+            # Write to the first worksheet (index 0) for backward compatibility
+            first_worksheet = lhd_spreadsheet.worksheet("index", 0)
+            first_worksheet.set_dataframe(
                 adds, (live_dataframe.shape[0] + 2, 1), copy_index=False, copy_head=False, extend=True, nan=""
             )
 
