@@ -401,7 +401,7 @@ class Skid:
         if dataframes:
             live_dataframe = pd.concat(dataframes, ignore_index=True)
         else:
-            live_dataframe = pd.DataFrame()
+            live_dataframe = pd.DataFrame(columns=["GlobalID"])
         lhd_dataframe = responses[responses["Local Health District:"] == lhd_abbreviation].copy()
         adds = lhd_dataframe[~lhd_dataframe["GlobalID"].isin(live_dataframe["GlobalID"])]
         if not adds.empty:
