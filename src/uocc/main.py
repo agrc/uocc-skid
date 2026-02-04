@@ -400,13 +400,6 @@ class Skid:
         # Combine all DataFrames into one
         if dataframes:
             live_dataframe = pd.concat(dataframes, ignore_index=True)
-            # Remove duplicate GlobalIDs to prevent issues with new record detection
-            if "GlobalID" in live_dataframe.columns:
-                original_count = len(live_dataframe)
-                live_dataframe = live_dataframe.drop_duplicates(subset=["GlobalID"], keep="last")
-                duplicates_removed = original_count - len(live_dataframe)
-                if duplicates_removed > 0:
-                    self.skid_logger.debug("Removed %s duplicate GlobalID(s) from combined data", duplicates_removed)
         else:
             live_dataframe = pd.DataFrame()
         lhd_dataframe = responses[responses["Local Health District:"] == lhd_abbreviation].copy()
