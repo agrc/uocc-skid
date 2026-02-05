@@ -391,24 +391,33 @@ class Skid:
         self.skid_logger.debug("Found %s worksheets in the %s sheet", len(all_worksheets), lhd_abbreviation)
         
         dataframes = []
+        first_worksheet_df = None
         for idx, worksheet in enumerate(all_worksheets):
             self.skid_logger.debug("Reading worksheet %s of %s: %s", idx + 1, len(all_worksheets), worksheet.title)
             df = worksheet.get_as_df()
             if not df.empty:
                 dataframes.append(df)
+                # Keep track of the first worksheet's data for row indexing
+                if first_worksheet_df is None:
+                    first_worksheet_df = df
         
         # Combine all DataFrames into one
         if dataframes:
             live_dataframe = pd.concat(dataframes, ignore_index=True)
         else:
             live_dataframe = pd.DataFrame(columns=["GlobalID"])
+        
+        # Track the size of the first worksheet for appending new rows
+        if first_worksheet_df is None:
+            first_worksheet_df = pd.DataFrame(columns=["GlobalID"])
+        
         lhd_dataframe = responses[responses["Local Health District:"] == lhd_abbreviation].copy()
         adds = lhd_dataframe[~lhd_dataframe["GlobalID"].isin(live_dataframe["GlobalID"])]
         if not adds.empty:
             # Write to the first worksheet (index 0) for backward compatibility
             first_worksheet = lhd_spreadsheet.worksheet("index", 0)
             first_worksheet.set_dataframe(
-                adds, (live_dataframe.shape[0] + 2, 1), copy_index=False, copy_head=False, extend=True, nan=""
+                adds, (first_worksheet_df.shape[0] + 2, 1), copy_index=False, copy_head=False, extend=True, nan=""
             )
 
             add_count = adds.shape[0]
