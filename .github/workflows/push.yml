@@ -34,7 +34,7 @@ jobs:
   deploy-dev:
     name: Deploy to Cloud Run (dev)
     runs-on: ubuntu-latest
-    if: github.ref_name == 'dev'
+    if: github.ref_name == 'dev' || contains(github.ref_name, 'copilot/')
     environment:
       name: dev
     permissions:
