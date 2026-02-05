@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.4](https://github.com/agrc/uocc-skid/compare/v1.0.3...v1.0.4) (2026-02-05)
+
+
+### Features
+
+* iterate through all worksheets and combine data ([cd77199](https://github.com/agrc/uocc-skid/commit/cd77199704fbec2f62c399994264d584bf83315b))
+
+
+### Bug Fixes
+
+* add duplicate GlobalID handling and logging ([db71093](https://github.com/agrc/uocc-skid/commit/db710931a12938945b68eba6188978fc1c66804f))
+* add GlobalID column to empty DataFrame ([e13a9d5](https://github.com/agrc/uocc-skid/commit/e13a9d54b1b2845ed1f8bc52bb3bff94896cdd90))
+* remove duplicate GlobalID check per feedback ([12ff84d](https://github.com/agrc/uocc-skid/commit/12ff84d86fe96f7b564c91e9f905513034480f90))
+* use first worksheet size for row index when appending ([fb368fb](https://github.com/agrc/uocc-skid/commit/fb368fb290a7c3cbdc169d88f7277d802920065a))
+
 ## [1.0.3](https://github.com/agrc/uocc-skid/compare/v1.0.2...v1.0.3) (2026-02-04)
 
 
