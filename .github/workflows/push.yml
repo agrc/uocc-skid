@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - "copilot/*"
 
 concurrency:
   group: "${{ github.head_ref || github.ref }}"
