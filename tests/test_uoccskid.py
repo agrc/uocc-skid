@@ -529,9 +529,9 @@ class TestLoadResponsesToSheet:
         # Verify worksheets() was called to get all worksheets
         mock_spreadsheet.worksheets.assert_called_once()
         
-        # Verify both worksheets were read
-        assert mock_worksheet1.get_as_df.call_count == 1
-        assert mock_worksheet2.get_as_df.call_count == 1
+        # Verify all worksheets were read during iteration
+        assert mock_worksheet1.get_as_df.call_count == 2  # Once during iteration, once to get size for appending
+        assert mock_worksheet2.get_as_df.call_count == 1  # Once during iteration
         
         # Verify only the new row (id5) was added
         assert result == 1
@@ -631,9 +631,9 @@ class TestLoadResponsesToSheet:
         # Call the method - this should not raise a KeyError
         result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
         
-        # Should have read both worksheets
-        assert mock_worksheet1.get_as_df.call_count == 1
-        assert mock_worksheet2.get_as_df.call_count == 1
+        # Should have read all worksheets during iteration, plus first worksheet again to get size
+        assert mock_worksheet1.get_as_df.call_count == 2  # Once during iteration, once to get size for appending
+        assert mock_worksheet2.get_as_df.call_count == 1  # Once during iteration
         
         # All responses should be added since live_dataframe is empty
         assert result == 3
@@ -644,4 +644,113 @@ class TestLoadResponsesToSheet:
         added_df = call_args[0][0]
         assert len(added_df) == 3
         assert set(added_df["GlobalID"].tolist()) == {"id1", "id2", "id3"}
+
+    def test_load_responses_appends_to_empty_first_worksheet_at_row_2(self, mocker):
+        """Test that new rows are appended at row 2 (header row + 1) when first worksheet is empty"""
+        # Setup mock worksheets - first is empty, second has data
+        worksheet1_data = pd.DataFrame()  # Empty first worksheet
+        worksheet2_data = pd.DataFrame(
+            {
+                "GlobalID": ["id1", "id2"],
+                "Local Health District:": ["LHD1", "LHD1"],
+            }
+        )
+        
+        mock_worksheet1 = mocker.Mock()
+        mock_worksheet1.get_as_df.return_value = worksheet1_data
+        mock_worksheet1.title = "Worksheet1"
+        
+        mock_worksheet2 = mocker.Mock()
+        mock_worksheet2.get_as_df.return_value = worksheet2_data
+        mock_worksheet2.title = "Worksheet2"
+        
+        mock_spreadsheet = mocker.Mock()
+        mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
+        mock_spreadsheet.worksheet.return_value = mock_worksheet1
+        
+        mock_gsheets_client = mocker.Mock()
+        mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
+        
+        mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
+        
+        skid_instance = mocker.Mock()
+        skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
+        skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
+        
+        # Create responses with new data
+        responses = pd.DataFrame(
+            {
+                "GlobalID": ["id3", "id4"],
+                "Local Health District:": ["LHD1", "LHD1"],
+            }
+        )
+        
+        result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
+        
+        # Should add 2 new rows
+        assert result == 2
+        
+        # Verify set_dataframe was called with correct row index
+        # Empty worksheet has 0 rows, so new data should start at row 2 (0 + 2)
+        mock_worksheet1.set_dataframe.assert_called_once()
+        call_args = mock_worksheet1.set_dataframe.call_args
+        row_index = call_args[0][1][0]  # Get the row position (first element of the tuple)
+        assert row_index == 2, f"Expected row index 2, got {row_index}"
+
+    def test_load_responses_appends_after_existing_rows_in_first_worksheet(self, mocker):
+        """Test that new rows are appended after existing rows in the first worksheet"""
+        # Setup mock worksheets - first has 3 rows, second has different data
+        worksheet1_data = pd.DataFrame(
+            {
+                "GlobalID": ["id1", "id2", "id3"],
+                "Local Health District:": ["LHD1", "LHD1", "LHD1"],
+            }
+        )
+        worksheet2_data = pd.DataFrame(
+            {
+                "GlobalID": ["id4", "id5"],
+                "Local Health District:": ["LHD1", "LHD1"],
+            }
+        )
+        
+        mock_worksheet1 = mocker.Mock()
+        mock_worksheet1.get_as_df.return_value = worksheet1_data
+        mock_worksheet1.title = "Worksheet1"
+        
+        mock_worksheet2 = mocker.Mock()
+        mock_worksheet2.get_as_df.return_value = worksheet2_data
+        mock_worksheet2.title = "Worksheet2"
+        
+        mock_spreadsheet = mocker.Mock()
+        mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
+        mock_spreadsheet.worksheet.return_value = mock_worksheet1
+        
+        mock_gsheets_client = mocker.Mock()
+        mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
+        
+        mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
+        
+        skid_instance = mocker.Mock()
+        skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
+        skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
+        
+        # Create responses with new data not in either worksheet
+        responses = pd.DataFrame(
+            {
+                "GlobalID": ["id1", "id2", "id3", "id4", "id5", "id6", "id7"],
+                "Local Health District:": ["LHD1", "LHD1", "LHD1", "LHD1", "LHD1", "LHD1", "LHD1"],
+            }
+        )
+        
+        result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
+        
+        # Should add 2 new rows (id6 and id7 are not in any worksheet)
+        assert result == 2
+        
+        # Verify set_dataframe was called with correct row index
+        # First worksheet has 3 rows, so new data should start at row 5 (3 + 2)
+        mock_worksheet1.set_dataframe.assert_called_once()
+        call_args = mock_worksheet1.set_dataframe.call_args
+        row_index = call_args[0][1][0]  # Get the row position (first element of the tuple)
+        assert row_index == 5, f"Expected row index 5, got {row_index}"
 
