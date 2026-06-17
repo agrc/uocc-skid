@@ -3,6 +3,8 @@
 [![Push Events](https://github.com/agrc/uocc-skid/actions/workflows/push.yml/badge.svg)](https://github.com/agrc/uocc-skid/actions/workflows/push.yml)
 [![Release Events](https://github.com/agrc/uocc-skid/actions/workflows/release.yml/badge.svg)](https://github.com/agrc/uocc-skid/actions/workflows/release.yml)
 
+DEQ Contact: Rachel Boyer (DWMRC)
+
 Moves data around to support a Survey123 form to replace DEQ's Used Oil Collection Center (UOCC) PDF forms.
 
 This has three distinct ETL pipelines: feature service to Google Sheets to extract form responses, feature service to Google Sheets to update contacts, and Google Sheets to Survey123 data CSVs to pre-populate form data.
