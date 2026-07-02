@@ -171,6 +171,7 @@ class Skid:
         locations_df = self._add_lhd_by_county(locations_df)
         locations_df = self._clean_field_names(locations_df)
         locations_df = self._fix_apostrophes_bug(locations_df)
+        locations_df = locations_df.replace({"\n": ""}, regex=True)
         locations_df.sort_values(by=["FacilityName"], inplace=True)  #: Makes name list alphabetical in survey
         locations_without_ids = locations_df[locations_df["ID"].isna()]
 
@@ -313,6 +314,8 @@ class Skid:
 
         #: Overwrite the locations and contacts with the new data
         locations_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/locations_with_lhd.csv", index=False)
+        locations_df.to_csv("~/Downloads/locations_with_lhd.csv", index=False)
+
         contacts_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/uocc_contacts.csv", index=False)
 
         #: Remove old zip file to avoid conflicts
@@ -385,24 +388,24 @@ class Skid:
         )
         gsheets_client = utils.authorize_pygsheets(self.secrets.GOOGLE_CREDENTIALS)
         lhd_spreadsheet = gsheets_client.open_by_key(self.lhd_sheet_ids[lhd_abbreviation])
-        
+
         # Iterate through all worksheets and combine their data
         all_worksheets = lhd_spreadsheet.worksheets()
         self.skid_logger.debug("Found %s worksheets in the %s sheet", len(all_worksheets), lhd_abbreviation)
-        
+
         dataframes = []
         for idx, worksheet in enumerate(all_worksheets):
             self.skid_logger.debug("Reading worksheet %s of %s: %s", idx + 1, len(all_worksheets), worksheet.title)
             df = worksheet.get_as_df()
             if not df.empty:
                 dataframes.append(df)
-        
+
         # Combine all DataFrames into one
         if dataframes:
             live_dataframe = pd.concat(dataframes, ignore_index=True)
         else:
             live_dataframe = pd.DataFrame(columns=["GlobalID"])
-        
+
         lhd_dataframe = responses[responses["Local Health District:"] == lhd_abbreviation].copy()
         adds = lhd_dataframe[~lhd_dataframe["GlobalID"].isin(live_dataframe["GlobalID"])]
         if not adds.empty:
