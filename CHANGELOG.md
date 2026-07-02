@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/agrc/uocc-skid/compare/v1.0.4...v1.0.5) (2026-07-02)
+
+
+### Bug Fixes
+
+* remove newline characters ([265325b](https://github.com/agrc/uocc-skid/commit/265325b536da7c94be0240722651a3ba59b8508b))
+
 ## [1.0.4](https://github.com/agrc/uocc-skid/compare/v1.0.3...v1.0.4) (2026-02-05)
 
 
