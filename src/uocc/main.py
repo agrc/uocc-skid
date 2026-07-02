@@ -314,7 +314,6 @@ class Skid:
 
         #: Overwrite the locations and contacts with the new data
         locations_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/locations_with_lhd.csv", index=False)
-        locations_df.to_csv("~/Downloads/locations_with_lhd.csv", index=False)
 
         contacts_df.to_csv(self.tempdir_path / "_survey/esriinfo/media/uocc_contacts.csv", index=False)
 
