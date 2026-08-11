@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # * coding: utf8 *
 """
-Run the uocc-skid as a Cloud Run instance. Uses the entry point defined in setup.py and the Dockerfile.
+Run the uocc-skid as a Cloud Run instance. Uses the configured package entry point and the Dockerfile.
 """
 
 import json
@@ -25,10 +25,9 @@ from supervisor.models import MessageDetails, Supervisor
 #: This makes it work when calling with just `python <file>`/installing via pip and in the gcf framework, where
 #: the relative imports fail because of how it's calling the function.
 try:
-    from . import config, version
+    from . import __version__, config
 except ImportError:
-    import config
-    import version
+    from uocc import __version__, config
 
 
 class Skid:
@@ -112,7 +111,9 @@ class Skid:
         sendgrid_settings["api_key"] = self.secrets.SENDGRID_API_KEY
         self.supervisor.add_message_handler(
             SendGridHandler(
-                sendgrid_settings=sendgrid_settings, client_name=config.SKID_NAME, client_version=version.__version__
+                sendgrid_settings=sendgrid_settings,
+                client_name=config.SKID_NAME,
+                client_version=__version__,
             )
         )
 
