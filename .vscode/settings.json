@@ -25,6 +25,7 @@
     "psycopg",
     "pygsheets",
     "pyodbc",
+    "pyproject",
     "pytest",
     "rindex",
     "SCHD",

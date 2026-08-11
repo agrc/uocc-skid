@@ -27,6 +27,22 @@ DEQ maintains two sheets/tabs of information that are used to update the CSVs ho
 
 The skid is scheduled to run every Monday at 3:00 AM
 
+## Development
+
+Install the project and its development dependencies:
+
+```sh
+pip install -e ".[dev]"
+```
+
+Run the checks and build distributable artifacts:
+
+```sh
+ruff check .
+pytest
+python -m build --no-isolation
+```
+
 ## Make.com Automation
 
 The UOCC project also uses a make.com automation scenario that is triggered via webhook whenever an inspection is completed through Survey123. This automation generates a PDF report from the inspection results, emails it to the UOCC's contact, and saves it to a Google Drive folder for each LHD. The credentials for the Make.com account are stored in our password manager.
