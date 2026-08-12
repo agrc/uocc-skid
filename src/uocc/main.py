@@ -8,7 +8,7 @@ import re
 import shutil
 import sys
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
@@ -28,7 +28,7 @@ class Skid:
         self.secrets = SimpleNamespace(**self._get_secrets())
         self.tempdir = TemporaryDirectory(ignore_cleanup_errors=True)
         self.tempdir_path = Path(self.tempdir.name)
-        self.log_name = f"{config.LOG_FILE_NAME}_{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}.txt"
+        self.log_name = f"{config.LOG_FILE_NAME}_{datetime.now(UTC).strftime('%Y%m%d-%H%M%S')}.txt"
         self.log_path = self.tempdir_path / self.log_name
         self._initialize_supervisor()
         self.skid_logger = logging.getLogger(config.SKID_NAME)
@@ -134,7 +134,7 @@ class Skid:
     def process(self):
         """The main function that does all the work."""
 
-        start = datetime.now(timezone.utc)
+        start = datetime.now(UTC)
 
         #: Get our GIS object via the ArcGIS API for Python
         self.gis = arcgis.gis.GIS(config.AGOL_ORG, self.secrets.AGOL_USER, self.secrets.AGOL_PASSWORD)
@@ -181,7 +181,7 @@ class Skid:
         update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
         self.skid_logger.info("Survey media folder update success: %s", update_success)
 
-        end = datetime.now(timezone.utc)
+        end = datetime.now(UTC)
 
         summary_message = MessageDetails()
         summary_message.subject = f"{config.SKID_NAME} Update Summary"
