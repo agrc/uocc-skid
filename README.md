@@ -43,6 +43,12 @@ pytest
 python -m build --no-isolation
 ```
 
+Run the skid locally:
+
+```sh
+uocc-skid
+```
+
 ## Make.com Automation
 
 The UOCC project also uses a make.com automation scenario that is triggered via webhook whenever an inspection is completed through Survey123. This automation generates a PDF report from the inspection results, emails it to the UOCC's contact, and saves it to a Google Drive folder for each LHD. The credentials for the Make.com account are stored in our password manager.
