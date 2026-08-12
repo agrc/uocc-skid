@@ -33,6 +33,33 @@ def test_get_secrets_raises_if_no_secrets(mocker):
         assert "Secrets folder not found; secrets not loaded." in str(excinfo.value)
 
 
+class TestSupervisorInitialization:
+    def test_initialize_supervisor_skips_sendgrid_for_local_execution(self, mocker):
+        skid = mocker.Mock()
+        skid.log_path = "log_path"
+        supervisor = mocker.patch("uocc.main.Supervisor").return_value
+        sendgrid_handler = mocker.patch("uocc.main.SendGridHandler")
+        mocker.patch.object(main.config, "IS_LOCAL", True)
+
+        main.Skid._initialize_supervisor(skid)
+
+        sendgrid_handler.assert_not_called()
+        supervisor.add_message_handler.assert_not_called()
+
+    def test_initialize_supervisor_registers_sendgrid_for_deployed_execution(self, mocker):
+        skid = mocker.Mock()
+        skid.log_path = "log_path"
+        skid.secrets.SENDGRID_API_KEY = "api-key"
+        supervisor = mocker.patch("uocc.main.Supervisor").return_value
+        sendgrid_handler = mocker.patch("uocc.main.SendGridHandler")
+        mocker.patch.object(main.config, "IS_LOCAL", False)
+
+        main.Skid._initialize_supervisor(skid)
+
+        sendgrid_handler.assert_called_once()
+        supervisor.add_message_handler.assert_called_once_with(sendgrid_handler.return_value)
+
+
 class TestLocationsExtracting:
     def test_extract_locations_from_sheet_only_returns_opens(self, mocker):
         input_dataframe = pd.DataFrame(

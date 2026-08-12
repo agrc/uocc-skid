@@ -100,6 +100,10 @@ class Skid:
 
         skid_logger.debug("Creating Supervisor object")
         self.supervisor = Supervisor(handle_errors=True, logger=skid_logger, log_path=self.log_path)
+        if config.IS_LOCAL:
+            skid_logger.info("Skipping email notifications for local execution")
+            return
+
         sendgrid_settings = config.SENDGRID_SETTINGS
         sendgrid_settings["api_key"] = self.secrets.SENDGRID_API_KEY
         self.supervisor.add_message_handler(
