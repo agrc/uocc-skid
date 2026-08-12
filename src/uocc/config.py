@@ -16,7 +16,7 @@ try:
     if not project_id:
         raise ValueError
     HOST_NAME = project_id
-except Exception:
+except (OSError, UnicodeDecodeError, ValueError):
     HOST_NAME = socket.gethostname()
 
 AGOL_ORG = "https://utahdeq.maps.arcgis.com"
