@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.6](https://github.com/agrc/uocc-skid/compare/v1.0.5...v1.0.6) (2026-08-12)
+
+
+### Bug Fixes
+
+* don't send emails during local development ([2a94ec6](https://github.com/agrc/uocc-skid/commit/2a94ec633030f3b264c29bb568643697f28666fa))
+
+
+### Dependencies
+
+* python 3.11 -&gt; 3.13 ([0a0eaea](https://github.com/agrc/uocc-skid/commit/0a0eaea8a9a5be8e9811b5a840be1cba49d5f678))
+
 ## [1.0.5](https://github.com/agrc/uocc-skid/compare/v1.0.4...v1.0.5) (2026-07-02)
 
 
