@@ -5,8 +5,10 @@ config.py: Configuration values. Secrets to be handled with Secrets Manager
 import logging
 import socket
 import urllib.request
+from pathlib import Path
 
 SKID_NAME = "uocc-skid"
+IS_LOCAL = not Path("/secrets").exists()
 #: Try to get project id from GCP metadata server for hostname. If it's empty or errors out, revert to local hostname
 try:
     url = "http://metadata.google.internal/computeMetadata/v1/project/project-id"
