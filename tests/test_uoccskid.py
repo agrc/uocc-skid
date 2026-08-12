@@ -488,32 +488,32 @@ class TestLoadResponsesToSheet:
                 "Data": ["data3", "data4"],
             }
         )
-        
+
         # Mock worksheet objects
         mock_worksheet1 = mocker.Mock()
         mock_worksheet1.get_as_df.return_value = worksheet1_data
         mock_worksheet1.title = "Worksheet1"
-        
+
         mock_worksheet2 = mocker.Mock()
         mock_worksheet2.get_as_df.return_value = worksheet2_data
         mock_worksheet2.title = "Worksheet2"
-        
+
         # Mock spreadsheet to return both worksheets
         mock_spreadsheet = mocker.Mock()
         mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
         mock_spreadsheet.worksheet.return_value = mock_worksheet1  # For writing back
-        
+
         # Mock gsheets_client
         mock_gsheets_client = mocker.Mock()
         mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
-        
+
         mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
-        
+
         # Setup skid instance
         skid_instance = mocker.Mock()
         skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
         skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
-        
+
         # Create responses with a new row
         responses = pd.DataFrame(
             {
@@ -522,20 +522,20 @@ class TestLoadResponsesToSheet:
                 "Data": ["data1", "data2", "data3", "data4", "data5_new"],
             }
         )
-        
+
         # Call the method
         result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
-        
+
         # Verify worksheets() was called to get all worksheets
         mock_spreadsheet.worksheets.assert_called_once()
-        
+
         # Verify all worksheets were read during iteration
         assert mock_worksheet1.get_as_df.call_count == 2  # Once during iteration, once to get size for appending
         assert mock_worksheet2.get_as_df.call_count == 1  # Once during iteration
-        
+
         # Verify only the new row (id5) was added
         assert result == 1
-        
+
         # Verify set_dataframe was called with the new data
         mock_worksheet1.set_dataframe.assert_called_once()
         call_args = mock_worksheet1.set_dataframe.call_args
@@ -553,41 +553,41 @@ class TestLoadResponsesToSheet:
             }
         )
         worksheet2_data = pd.DataFrame()  # Empty worksheet
-        
+
         mock_worksheet1 = mocker.Mock()
         mock_worksheet1.get_as_df.return_value = worksheet1_data
         mock_worksheet1.title = "Worksheet1"
-        
+
         mock_worksheet2 = mocker.Mock()
         mock_worksheet2.get_as_df.return_value = worksheet2_data
         mock_worksheet2.title = "Worksheet2"
-        
+
         mock_spreadsheet = mocker.Mock()
         mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
         mock_spreadsheet.worksheet.return_value = mock_worksheet1
-        
+
         mock_gsheets_client = mocker.Mock()
         mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
-        
+
         mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
-        
+
         skid_instance = mocker.Mock()
         skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
         skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
-        
+
         responses = pd.DataFrame(
             {
                 "GlobalID": ["id1", "id2"],
                 "Local Health District:": ["LHD1", "LHD1"],
             }
         )
-        
+
         result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
-        
+
         # Should have read both worksheets
         assert mock_worksheet1.get_as_df.call_count == 1
         assert mock_worksheet2.get_as_df.call_count == 1
-        
+
         # No new data to add
         assert result == 0
 
@@ -597,28 +597,28 @@ class TestLoadResponsesToSheet:
         # Setup mock worksheets that are all empty
         worksheet1_data = pd.DataFrame()  # Empty worksheet
         worksheet2_data = pd.DataFrame()  # Empty worksheet
-        
+
         mock_worksheet1 = mocker.Mock()
         mock_worksheet1.get_as_df.return_value = worksheet1_data
         mock_worksheet1.title = "Worksheet1"
-        
+
         mock_worksheet2 = mocker.Mock()
         mock_worksheet2.get_as_df.return_value = worksheet2_data
         mock_worksheet2.title = "Worksheet2"
-        
+
         mock_spreadsheet = mocker.Mock()
         mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
         mock_spreadsheet.worksheet.return_value = mock_worksheet1
-        
+
         mock_gsheets_client = mocker.Mock()
         mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
-        
+
         mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
-        
+
         skid_instance = mocker.Mock()
         skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
         skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
-        
+
         # Create responses with new data
         responses = pd.DataFrame(
             {
@@ -627,17 +627,17 @@ class TestLoadResponsesToSheet:
                 "Data": ["data1", "data2", "data3"],
             }
         )
-        
+
         # Call the method - this should not raise a KeyError
         result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
-        
+
         # Should have read all worksheets during iteration, plus first worksheet again to get size
         assert mock_worksheet1.get_as_df.call_count == 2  # Once during iteration, once to get size for appending
         assert mock_worksheet2.get_as_df.call_count == 1  # Once during iteration
-        
+
         # All responses should be added since live_dataframe is empty
         assert result == 3
-        
+
         # Verify set_dataframe was called with all the new data
         mock_worksheet1.set_dataframe.assert_called_once()
         call_args = mock_worksheet1.set_dataframe.call_args
@@ -655,28 +655,28 @@ class TestLoadResponsesToSheet:
                 "Local Health District:": ["LHD1", "LHD1"],
             }
         )
-        
+
         mock_worksheet1 = mocker.Mock()
         mock_worksheet1.get_as_df.return_value = worksheet1_data
         mock_worksheet1.title = "Worksheet1"
-        
+
         mock_worksheet2 = mocker.Mock()
         mock_worksheet2.get_as_df.return_value = worksheet2_data
         mock_worksheet2.title = "Worksheet2"
-        
+
         mock_spreadsheet = mocker.Mock()
         mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
         mock_spreadsheet.worksheet.return_value = mock_worksheet1
-        
+
         mock_gsheets_client = mocker.Mock()
         mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
-        
+
         mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
-        
+
         skid_instance = mocker.Mock()
         skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
         skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
-        
+
         # Create responses with new data
         responses = pd.DataFrame(
             {
@@ -684,12 +684,12 @@ class TestLoadResponsesToSheet:
                 "Local Health District:": ["LHD1", "LHD1"],
             }
         )
-        
+
         result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
-        
+
         # Should add 2 new rows
         assert result == 2
-        
+
         # Verify set_dataframe was called with correct row index
         # Empty worksheet has 0 rows, so new data should start at row 2 (0 + 2)
         mock_worksheet1.set_dataframe.assert_called_once()
@@ -712,28 +712,28 @@ class TestLoadResponsesToSheet:
                 "Local Health District:": ["LHD1", "LHD1"],
             }
         )
-        
+
         mock_worksheet1 = mocker.Mock()
         mock_worksheet1.get_as_df.return_value = worksheet1_data
         mock_worksheet1.title = "Worksheet1"
-        
+
         mock_worksheet2 = mocker.Mock()
         mock_worksheet2.get_as_df.return_value = worksheet2_data
         mock_worksheet2.title = "Worksheet2"
-        
+
         mock_spreadsheet = mocker.Mock()
         mock_spreadsheet.worksheets.return_value = [mock_worksheet1, mock_worksheet2]
         mock_spreadsheet.worksheet.return_value = mock_worksheet1
-        
+
         mock_gsheets_client = mocker.Mock()
         mock_gsheets_client.open_by_key.return_value = mock_spreadsheet
-        
+
         mocker.patch("palletjack.utils.authorize_pygsheets", return_value=mock_gsheets_client)
-        
+
         skid_instance = mocker.Mock()
         skid_instance.lhd_sheet_ids = {"LHD1": "sheet_id_123"}
         skid_instance.secrets.GOOGLE_CREDENTIALS = "mock_credentials"
-        
+
         # Create responses with new data not in either worksheet
         responses = pd.DataFrame(
             {
@@ -741,16 +741,15 @@ class TestLoadResponsesToSheet:
                 "Local Health District:": ["LHD1", "LHD1", "LHD1", "LHD1", "LHD1", "LHD1", "LHD1"],
             }
         )
-        
+
         result = main.Skid._load_responses_to_sheet(skid_instance, responses, "LHD1")
-        
+
         # Should add 2 new rows (id6 and id7 are not in any worksheet)
         assert result == 2
-        
+
         # Verify set_dataframe was called with correct row index
         # First worksheet has 3 rows, so new data should start at row 5 (3 + 2)
         mock_worksheet1.set_dataframe.assert_called_once()
         call_args = mock_worksheet1.set_dataframe.call_args
         row_index = call_args[0][1][0]  # Get the row position (first element of the tuple)
         assert row_index == 5, f"Expected row index 5, got {row_index}"
-

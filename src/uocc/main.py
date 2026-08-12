@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# * coding: utf8 *
 """
 Run the uocc-skid as a Cloud Run instance. Uses the configured package entry point and the Dockerfile.
 """
@@ -10,7 +8,7 @@ import re
 import shutil
 import sys
 import zipfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
@@ -30,7 +28,7 @@ class Skid:
         self.secrets = SimpleNamespace(**self._get_secrets())
         self.tempdir = TemporaryDirectory(ignore_cleanup_errors=True)
         self.tempdir_path = Path(self.tempdir.name)
-        self.log_name = f"{config.LOG_FILE_NAME}_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
+        self.log_name = f"{config.LOG_FILE_NAME}_{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}.txt"
         self.log_path = self.tempdir_path / self.log_name
         self._initialize_supervisor()
         self.skid_logger = logging.getLogger(config.SKID_NAME)
@@ -112,6 +110,7 @@ class Skid:
             )
         )
 
+    @staticmethod
     def _remove_log_file_handlers(log_name, loggers):
         """A helper function to remove the file handlers so the tempdir will close correctly
 
@@ -122,17 +121,16 @@ class Skid:
 
         for logger in loggers:
             for handler in logger.handlers:
-                try:
-                    if log_name in handler.stream.name:
-                        logger.removeHandler(handler)
-                        handler.close()
-                except Exception:
-                    pass
+                stream = getattr(handler, "stream", None)
+                stream_name = getattr(stream, "name", "")
+                if log_name in str(stream_name):
+                    logger.removeHandler(handler)
+                    handler.close()
 
     def process(self):
         """The main function that does all the work."""
 
-        start = datetime.now()
+        start = datetime.now(timezone.utc)
 
         #: Get our GIS object via the ArcGIS API for Python
         self.gis = arcgis.gis.GIS(config.AGOL_ORG, self.secrets.AGOL_USER, self.secrets.AGOL_PASSWORD)
@@ -179,7 +177,7 @@ class Skid:
         update_success = self._update_items_in_survey_media_folder(locations_df, contacts_df)
         self.skid_logger.info("Survey media folder update success: %s", update_success)
 
-        end = datetime.now()
+        end = datetime.now(timezone.utc)
 
         summary_message = MessageDetails()
         summary_message.subject = f"{config.SKID_NAME} Update Summary"
@@ -189,7 +187,7 @@ class Skid:
             "",
             f"Start time: {start.strftime('%H:%M:%S')}",
             f"End time: {end.strftime('%H:%M:%S')}",
-            f"Duration: {str(end - start)}",
+            f"Duration: {end - start!s}",
             f"Locations extracted: {len(locations_df)}",
             f"Locations without IDs: {len(locations_without_ids)}",
             f"Contacts extracted: {len(contacts_df)}",
@@ -214,7 +212,7 @@ class Skid:
 
         #: Remove file handler so the tempdir will close properly
         loggers = [logging.getLogger(config.SKID_NAME), logging.getLogger("palletjack")]
-        self._remove_log_file_handlers(loggers)
+        self._remove_log_file_handlers(self.log_name, loggers)
 
     def _extract_locations_from_sheet(self):
         gsheet_extractor = extract.GSheetLoader(self.secrets.GOOGLE_CREDENTIALS)
@@ -433,7 +431,7 @@ class Skid:
         try:
             self._load_updates_to_contacts_sheet(updated_contacts_df)
             contact_update_status = "Contacts sheet updated successfully"
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.skid_logger.error("Error updating contacts sheet: %s", e)
             contact_update_status = f"Contacts sheet update failed: {e}"
         return updated_contacts_df, contact_update_status
