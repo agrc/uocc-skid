@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "accesstoken",
+    "addopts",
     "agrc",
     "arcgis",
     "arcpy",
@@ -16,7 +17,9 @@
     "libkrb",
     "mapserv",
     "metatable",
+    "minversion",
     "mssql",
+    "norecursedirs",
     "ODBC",
     "oidc",
     "opensgid",
@@ -38,6 +41,7 @@
     "SWUHD",
     "TCHD",
     "TCOHD",
+    "testpaths",
     "UCHD",
     "UGRC",
     "uocc",
