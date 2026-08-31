@@ -5,6 +5,8 @@
 
 DEQ Contact: Rachel Boyer (DWMRC)
 
+[Production Survey123 Form]()
+
 Moves data around to support a Survey123 form to replace DEQ's Used Oil Collection Center (UOCC) PDF forms.
 
 This has three distinct ETL pipelines: feature service to Google Sheets to extract form responses, feature service to Google Sheets to update contacts, and Google Sheets to Survey123 data CSVs to pre-populate form data.
@@ -58,6 +60,13 @@ The scenario also monitors the "Request DWMRC assistance" question, and if the r
 The "blueprint" JSON for the automation is stored in the `src/make_automation` directory. It requires making three Connections in Make: a Survey123 connection, a Sendgrid connection, and a Google Drive connection. To recreate the automation, you will need to modify the scenario to use the new connections. It may be easiest to use the old flow as a example to copy/rebuild from rather than try to insert and update it directly. The Survey123 connection uses the credentials for DEQ's AGOL org, Sendgrid uses our account, and Google Drive uses a custom OAuth client in the GCP project. Using the OAuth client via Make.com requires the use of a personal google account. It's currently pointed at stdavis@utah.gov. I tried pointing it at agrc@utah.gov but it didn't work.
 
 As far as we know, the GCP OAuth client cannot be created through Terraform and must be created manually. Make.com's [documentation](https://apps.make.com/google-drive#KA5rq) includes the necessary settings for the client. Once you've created it, copy the Client ID and Client Secret. You'll paste these into the Make.com connection to handle authentication.
+
+If you need to regenerate reports by manually rerunning the Make Scenario, here are the steps:
+
+1. Go to the Survey123 website -> Settings -> Webhooks -> Trigger events and enable "Existing record edited"
+1. Open the record in the Data tab and make a minor edit to trigger the webhook (e.g., add "regenerate report" to the comments field).
+1. The Make.com scenario should then run and regenerate the report based on the updated record.
+1. Revert the webhook setting by disabling "Existing record edited" to prevent unintended triggers.
 
 ## Attribution
 
