@@ -30,7 +30,7 @@ Homepage = "https://github.com/agrc/skid"
 dev = [
   "build",
   "hatchling",
-  "pytest-cov>=6",
+  "pytest-cov>=7.1.0",
   "pytest-instafail==0.5.*",
   "pytest-mock==3.*",
   "pytest-watch==4.*",
