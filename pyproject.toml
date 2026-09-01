@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
   "ugrc-palletjack>=5.0,<6.1",
-  "ugrc-supervisor>=3.1.3",
+  "ugrc-supervisor>=3.3.0",
 ]
 
 [project.urls]
