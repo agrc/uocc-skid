@@ -18,7 +18,7 @@ classifiers = [
   "Topic :: Utilities",
 ]
 dependencies = [
-  "ugrc-palletjack>=5.0,<6.1",
+  "ugrc-palletjack>=6.0.5,<6.1",
   "ugrc-supervisor>=3.1.3",
 ]
 
