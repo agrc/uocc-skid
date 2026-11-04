@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.7](https://github.com/agrc/uocc-skid/compare/v1.0.6...v1.0.7) (2026-11-04)
+
+
+### Dependencies
+
+* **dev:** update pytest requirement from &lt;10,&gt;=7 to &gt;=9.1.1,&lt;10 ([#29](https://github.com/agrc/uocc-skid/issues/29)) ([352315c](https://github.com/agrc/uocc-skid/commit/352315c521734c6eacc11afffbd75cfd466a346a))
+* **dev:** update pytest-cov requirement from &gt;=6 to &gt;=7.1.0 ([#32](https://github.com/agrc/uocc-skid/issues/32)) ([b7f4d90](https://github.com/agrc/uocc-skid/commit/b7f4d90b97d9814b1c425d1df95ce344caa1f9f7))
+* update ugrc-palletjack requirement from &lt;6.1,&gt;=5.0 to &gt;=6.1.1,&lt;6.2 ([#34](https://github.com/agrc/uocc-skid/issues/34)) ([daf917d](https://github.com/agrc/uocc-skid/commit/daf917d518d82d07db119e60b0f4539586209d5a))
+* update ugrc-supervisor requirement from &gt;=3.1.3 to &gt;=3.3.0 ([#31](https://github.com/agrc/uocc-skid/issues/31)) ([3aee124](https://github.com/agrc/uocc-skid/commit/3aee1245959192442ab6461135e82c244eaa78a8))
+
 ## [1.0.6](https://github.com/agrc/uocc-skid/compare/v1.0.5...v1.0.6) (2026-08-12)
 
 
