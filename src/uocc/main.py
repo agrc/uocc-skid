@@ -541,5 +541,4 @@ def entry():
 
 #: Putting this here means you can call the file via `python main.py` and it will run. Useful for pre-GCF testing.
 if __name__ == "__main__":
-    uocc_skid = Skid()
-    uocc_skid.process()
+    entry()
