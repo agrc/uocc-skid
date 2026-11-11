@@ -33,9 +33,6 @@ class Skid:
         self._initialize_supervisor()
         self.skid_logger = logging.getLogger(config.SKID_NAME)
 
-    def __del__(self):
-        self.tempdir.cleanup()
-
     @staticmethod
     def _get_secrets():
         """A helper method for loading secrets from either a GCF mount point or the local src/skid/secrets/secrets.json file
