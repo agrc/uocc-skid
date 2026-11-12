@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.8](https://github.com/agrc/uocc-skid/compare/v1.0.7...v1.0.8) (2026-11-12)
+
+
+### Bug Fixes
+
+* add six as a temporary dependency ([8d44c7f](https://github.com/agrc/uocc-skid/commit/8d44c7f85315408514951f94b4cbbfcebacb4f5a)), refs [#36](https://github.com/agrc/uocc-skid/issues/36)
+
 ## [1.0.7](https://github.com/agrc/uocc-skid/compare/v1.0.6...v1.0.7) (2026-11-04)
 
 
